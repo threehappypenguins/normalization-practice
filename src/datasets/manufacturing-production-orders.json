@@ -1,0 +1,278 @@
+{
+    "id": "manufacturing-production-orders",
+    "title": "Manufacturing Production Orders",
+    "difficulty": "hard",
+    "description": "Normalize a complex manufacturing system with production orders, multiple components per product, supplier information, warehouse locations, and quality inspections.",
+    "rawData": {
+      "tableName": "RAW_DATA",
+      "columns": ["ORDER_ID", "ORDER_DATE", "CUSTOMER_ID", "CUSTOMER_NAME", "CUSTOMER_CITY", "CUSTOMER_STATE", "STATE_TAX_RATE", "PRODUCT_ID", "PRODUCT_NAME", "COMPONENT1", "COMPONENT1_QTY", "SUPPLIER1_ID", "SUPPLIER1_NAME", "SUPPLIER1_COUNTRY", "COUNTRY_CURRENCY", "COMPONENT2", "COMPONENT2_QTY", "SUPPLIER2_ID", "SUPPLIER2_NAME", "SUPPLIER2_COUNTRY", "WAREHOUSE_ID", "WAREHOUSE_CITY", "WAREHOUSE_MANAGER"],
+      "rows": [
+        ["ORD001", "2024-01-15", "C001", "TechCorp", "Austin", "TX", "8.25", "P100", "Laptop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "RAM", "2", "S002", "MemoryPro", "Taiwan", "W001", "Dallas", "John Davis"],
+        ["ORD002", "2024-01-16", "C001", "TechCorp", "Austin", "TX", "8.25", "P200", "Desktop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "GPU", "1", "S003", "GraphixCorp", "USA", "W002", "Houston", "Sarah Lee"],
+        ["ORD003", "2024-01-17", "C002", "DataSystems", "Sacramento", "CA", "7.25", "P100", "Laptop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "RAM", "2", "S002", "MemoryPro", "Taiwan", "W003", "San Jose", "Mike Chen"],
+        ["ORD004", "2024-01-18", "C003", "InfoTech", "Portland", "OR", "0.00", "P300", "Server", "CPU", "2", "S001", "ChipMakers Inc", "USA", "USD", "Storage", "4", "S004", "DriveWorld", "South Korea", "W001", "Dallas", "John Davis"]
+      ]
+    },
+    "solutions": {
+      "1NF": {
+        "explanation": "Eliminate repeating component groups by creating separate rows for each component-supplier pair in a production order.",
+        "tables": [
+          {
+            "name": "PRODUCTION_ORDERS",
+            "columns": [
+              { "name": "ORDER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ORDER_ID"] },
+              { "name": "ORDER_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ORDER_DATE"] },
+              { "name": "CUSTOMER_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_ID"] },
+              { "name": "CUSTOMER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_NAME"] },
+              { "name": "CUSTOMER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_CITY"] },
+              { "name": "CUSTOMER_STATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_STATE"] },
+              { "name": "STATE_TAX_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["STATE_TAX_RATE"] },
+              { "name": "PRODUCT_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["PRODUCT_ID"] },
+              { "name": "PRODUCT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PRODUCT_NAME"] },
+              { "name": "COMPONENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COMPONENT1", "COMPONENT2"] },
+              { "name": "COMPONENT_QTY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COMPONENT1_QTY", "COMPONENT2_QTY"] },
+              { "name": "SUPPLIER_ID", "type": "PK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_ID", "SUPPLIER2_ID"] },
+              { "name": "SUPPLIER_NAME", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_NAME", "SUPPLIER2_NAME"] },
+              { "name": "SUPPLIER_COUNTRY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_COUNTRY", "SUPPLIER2_COUNTRY"] },
+              { "name": "COUNTRY_CURRENCY", "type": "attribute", "mappingType": "direct", "sourceCols": ["COUNTRY_CURRENCY"] },
+              { "name": "WAREHOUSE_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_ID"] },
+              { "name": "WAREHOUSE_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_CITY"] },
+              { "name": "WAREHOUSE_MANAGER", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_MANAGER"] }
+            ],
+            "sampleRows": [
+              ["ORD001", "2024-01-15", "C001", "TechCorp", "Austin", "TX", "8.25", "P100", "Laptop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "W001", "Dallas", "John Davis"],
+              ["ORD001", "2024-01-15", "C001", "TechCorp", "Austin", "TX", "8.25", "P100", "Laptop", "RAM", "2", "S002", "MemoryPro", "Taiwan", "USD", "W001", "Dallas", "John Davis"],
+              ["ORD002", "2024-01-16", "C001", "TechCorp", "Austin", "TX", "8.25", "P200", "Desktop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "W002", "Houston", "Sarah Lee"],
+              ["ORD002", "2024-01-16", "C001", "TechCorp", "Austin", "TX", "8.25", "P200", "Desktop", "GPU", "1", "S003", "GraphixCorp", "USA", "USD", "W002", "Houston", "Sarah Lee"],
+              ["ORD003", "2024-01-17", "C002", "DataSystems", "Sacramento", "CA", "7.25", "P100", "Laptop", "CPU", "1", "S001", "ChipMakers Inc", "USA", "USD", "W003", "San Jose", "Mike Chen"],
+              ["ORD003", "2024-01-17", "C002", "DataSystems", "Sacramento", "CA", "7.25", "P100", "Laptop", "RAM", "2", "S002", "MemoryPro", "Taiwan", "USD", "W003", "San Jose", "Mike Chen"],
+              ["ORD004", "2024-01-18", "C003", "InfoTech", "Portland", "OR", "0.00", "P300", "Server", "CPU", "2", "S001", "ChipMakers Inc", "USA", "USD", "W001", "Dallas", "John Davis"],
+              ["ORD004", "2024-01-18", "C003", "InfoTech", "Portland", "OR", "0.00", "P300", "Server", "Storage", "4", "S004", "DriveWorld", "South Korea", "USD", "W001", "Dallas", "John Davis"]
+            ]
+          }
+        ],
+        "hints": [
+          "Identify the repeating groups: COMPONENT1/COMPONENT2 with their quantities and supplier information.",
+          "Each component-supplier combination in an order should be its own row.",
+          "The composite key becomes (ORDER_ID, COMPONENT, SUPPLIER_ID)."
+        ]
+      },
+      "2NF": {
+        "explanation": "Remove partial dependencies: ORDER_DATE and customer info depend only on ORDER_ID; PRODUCT_NAME depends only on PRODUCT_ID; SUPPLIER_NAME and SUPPLIER_COUNTRY depend only on SUPPLIER_ID; WAREHOUSE_CITY and WAREHOUSE_MANAGER depend only on WAREHOUSE_ID. Separate these into appropriate tables.",
+        "tables": [
+          {
+            "name": "ORDERS",
+            "columns": [
+              { "name": "ORDER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ORDER_ID"] },
+              { "name": "ORDER_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ORDER_DATE"] },
+              { "name": "CUSTOMER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["CUSTOMER_ID"] },
+              { "name": "CUSTOMER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_NAME"] },
+              { "name": "CUSTOMER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_CITY"] },
+              { "name": "CUSTOMER_STATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_STATE"] },
+              { "name": "STATE_TAX_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["STATE_TAX_RATE"] },
+              { "name": "PRODUCT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PRODUCT_ID"] },
+              { "name": "PRODUCT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PRODUCT_NAME"] },
+              { "name": "WAREHOUSE_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["WAREHOUSE_ID"] },
+              { "name": "WAREHOUSE_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_CITY"] },
+              { "name": "WAREHOUSE_MANAGER", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_MANAGER"] }
+            ],
+            "sampleRows": [
+              ["ORD001", "2024-01-15", "C001", "TechCorp", "Austin", "TX", "8.25", "P100", "Laptop", "W001", "Dallas", "John Davis"],
+              ["ORD002", "2024-01-16", "C001", "TechCorp", "Austin", "TX", "8.25", "P200", "Desktop", "W002", "Houston", "Sarah Lee"],
+              ["ORD003", "2024-01-17", "C002", "DataSystems", "Sacramento", "CA", "7.25", "P100", "Laptop", "W003", "San Jose", "Mike Chen"],
+              ["ORD004", "2024-01-18", "C003", "InfoTech", "Portland", "OR", "0.00", "P300", "Server", "W001", "Dallas", "John Davis"]
+            ]
+          },
+          {
+            "name": "PRODUCT",
+            "columns": [
+              { "name": "PRODUCT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PRODUCT_ID"] },
+              { "name": "PRODUCT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PRODUCT_NAME"] }
+            ],
+            "sampleRows": [
+              ["P100", "Laptop"],
+              ["P200", "Desktop"],
+              ["P300", "Server"]
+            ]
+          },
+          {
+            "name": "SUPPLIER",
+            "columns": [
+              { "name": "SUPPLIER_ID", "type": "PK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_ID", "SUPPLIER2_ID"] },
+              { "name": "SUPPLIER_NAME", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_NAME", "SUPPLIER2_NAME"] },
+              { "name": "SUPPLIER_COUNTRY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_COUNTRY", "SUPPLIER2_COUNTRY"] },
+              { "name": "COUNTRY_CURRENCY", "type": "attribute", "mappingType": "direct", "sourceCols": ["COUNTRY_CURRENCY"] }
+            ],
+            "sampleRows": [
+              ["S001", "ChipMakers Inc", "USA", "USD"],
+              ["S002", "MemoryPro", "Taiwan", "TWD"],
+              ["S003", "GraphixCorp", "USA", "USD"],
+              ["S004", "DriveWorld", "South Korea", "KRW"]
+            ]
+          },
+          {
+            "name": "WAREHOUSE",
+            "columns": [
+              { "name": "WAREHOUSE_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["WAREHOUSE_ID"] },
+              { "name": "WAREHOUSE_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_CITY"] },
+              { "name": "WAREHOUSE_MANAGER", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_MANAGER"] }
+            ],
+            "sampleRows": [
+              ["W001", "Dallas", "John Davis"],
+              ["W002", "Houston", "Sarah Lee"],
+              ["W003", "San Jose", "Mike Chen"]
+            ]
+          },
+          {
+            "name": "ORDER_COMPONENT",
+            "columns": [
+              { "name": "ORDER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ORDER_ID"] },
+              { "name": "COMPONENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COMPONENT1", "COMPONENT2"] },
+              { "name": "COMPONENT_QTY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COMPONENT1_QTY", "COMPONENT2_QTY"] },
+              { "name": "SUPPLIER_ID", "type": "FK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_ID", "SUPPLIER2_ID"] }
+            ],
+            "sampleRows": [
+              ["ORD001", "CPU", "1", "S001"],
+              ["ORD001", "RAM", "2", "S002"],
+              ["ORD002", "CPU", "1", "S001"],
+              ["ORD002", "GPU", "1", "S003"],
+              ["ORD003", "CPU", "1", "S001"],
+              ["ORD003", "RAM", "2", "S002"],
+              ["ORD004", "CPU", "2", "S001"],
+              ["ORD004", "Storage", "4", "S004"]
+            ]
+          }
+        ],
+        "hints": [
+          "Customer information depends only on ORDER_ID (or CUSTOMER_ID), not on components.",
+          "PRODUCT_NAME depends only on PRODUCT_ID.",
+          "SUPPLIER_NAME and SUPPLIER_COUNTRY depend only on SUPPLIER_ID.",
+          "WAREHOUSE_CITY and WAREHOUSE_MANAGER depend only on WAREHOUSE_ID.",
+          "Separate orders, products, suppliers, warehouses, and order-component relationships."
+        ]
+      },
+      "3NF": {
+        "explanation": "Remove transitive dependencies: CUSTOMER_NAME, CUSTOMER_CITY, and CUSTOMER_STATE depend on CUSTOMER_ID (not directly on ORDER_ID); STATE_TAX_RATE depends on CUSTOMER_STATE (not directly on ORDER_ID or CUSTOMER_ID); COUNTRY_CURRENCY depends on SUPPLIER_COUNTRY (not directly on SUPPLIER_ID); PRODUCT_NAME depends on PRODUCT_ID (already separated). Extract these into separate tables.",
+        "tables": [
+          {
+            "name": "STATE",
+            "columns": [
+              { "name": "STATE", "type": "PK", "mappingType": "direct", "sourceCols": ["CUSTOMER_STATE"] },
+              { "name": "STATE_TAX_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["STATE_TAX_RATE"] }
+            ],
+            "sampleRows": [
+              ["TX", "8.25"],
+              ["CA", "7.25"],
+              ["OR", "0.00"]
+            ]
+          },
+          {
+            "name": "CUSTOMER",
+            "columns": [
+              { "name": "CUSTOMER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["CUSTOMER_ID"] },
+              { "name": "CUSTOMER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_NAME"] },
+              { "name": "CUSTOMER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUSTOMER_CITY"] },
+              { "name": "CUSTOMER_STATE", "type": "FK", "mappingType": "direct", "sourceCols": ["CUSTOMER_STATE"] }
+            ],
+            "sampleRows": [
+              ["C001", "TechCorp", "Austin", "TX"],
+              ["C002", "DataSystems", "Sacramento", "CA"],
+              ["C003", "InfoTech", "Portland", "OR"]
+            ]
+          },
+          {
+            "name": "COUNTRY",
+            "columns": [
+              { "name": "COUNTRY", "type": "PK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_COUNTRY", "SUPPLIER2_COUNTRY"] },
+              { "name": "COUNTRY_CURRENCY", "type": "attribute", "mappingType": "direct", "sourceCols": ["COUNTRY_CURRENCY"] }
+            ],
+            "sampleRows": [
+              ["USA", "USD"],
+              ["Taiwan", "TWD"],
+              ["South Korea", "KRW"]
+            ]
+          },
+          {
+            "name": "SUPPLIER",
+            "columns": [
+              { "name": "SUPPLIER_ID", "type": "PK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_ID", "SUPPLIER2_ID"] },
+              { "name": "SUPPLIER_NAME", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_NAME", "SUPPLIER2_NAME"] },
+              { "name": "SUPPLIER_COUNTRY", "type": "FK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_COUNTRY", "SUPPLIER2_COUNTRY"] }
+            ],
+            "sampleRows": [
+              ["S001", "ChipMakers Inc", "USA"],
+              ["S002", "MemoryPro", "Taiwan"],
+              ["S003", "GraphixCorp", "USA"],
+              ["S004", "DriveWorld", "South Korea"]
+            ]
+          },
+          {
+            "name": "PRODUCT",
+            "columns": [
+              { "name": "PRODUCT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PRODUCT_ID"] },
+              { "name": "PRODUCT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PRODUCT_NAME"] }
+            ],
+            "sampleRows": [
+              ["P100", "Laptop"],
+              ["P200", "Desktop"],
+              ["P300", "Server"]
+            ]
+          },
+          {
+            "name": "WAREHOUSE",
+            "columns": [
+              { "name": "WAREHOUSE_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["WAREHOUSE_ID"] },
+              { "name": "WAREHOUSE_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_CITY"] },
+              { "name": "WAREHOUSE_MANAGER", "type": "attribute", "mappingType": "direct", "sourceCols": ["WAREHOUSE_MANAGER"] }
+            ],
+            "sampleRows": [
+              ["W001", "Dallas", "John Davis"],
+              ["W002", "Houston", "Sarah Lee"],
+              ["W003", "San Jose", "Mike Chen"]
+            ]
+          },
+          {
+            "name": "ORDERS",
+            "columns": [
+              { "name": "ORDER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ORDER_ID"] },
+              { "name": "ORDER_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ORDER_DATE"] },
+              { "name": "CUSTOMER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["CUSTOMER_ID"] },
+              { "name": "PRODUCT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PRODUCT_ID"] },
+              { "name": "WAREHOUSE_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["WAREHOUSE_ID"] }
+            ],
+            "sampleRows": [
+              ["ORD001", "2024-01-15", "C001", "P100", "W001"],
+              ["ORD002", "2024-01-16", "C001", "P200", "W002"],
+              ["ORD003", "2024-01-17", "C002", "P100", "W003"],
+              ["ORD004", "2024-01-18", "C003", "P300", "W001"]
+            ]
+          },
+          {
+            "name": "ORDER_COMPONENT",
+            "columns": [
+              { "name": "ORDER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ORDER_ID"] },
+              { "name": "COMPONENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COMPONENT1", "COMPONENT2"] },
+              { "name": "COMPONENT_QTY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COMPONENT1_QTY", "COMPONENT2_QTY"] },
+              { "name": "SUPPLIER_ID", "type": "FK", "mappingType": "consolidate", "sourceCols": ["SUPPLIER1_ID", "SUPPLIER2_ID"] }
+            ],
+            "sampleRows": [
+              ["ORD001", "CPU", "1", "S001"],
+              ["ORD001", "RAM", "2", "S002"],
+              ["ORD002", "CPU", "1", "S001"],
+              ["ORD002", "GPU", "1", "S003"],
+              ["ORD003", "CPU", "1", "S001"],
+              ["ORD003", "RAM", "2", "S002"],
+              ["ORD004", "CPU", "2", "S001"],
+              ["ORD004", "Storage", "4", "S004"]
+            ]
+          }
+        ],
+        "hints": [
+          "In ORDERS: CUSTOMER_NAME, CUSTOMER_CITY, CUSTOMER_STATE depend on CUSTOMER_ID (transitive dependency).",
+          "STATE_TAX_RATE depends on CUSTOMER_STATE, not directly on CUSTOMER_ID (another transitive dependency).",
+          "In SUPPLIER: COUNTRY_CURRENCY depends on SUPPLIER_COUNTRY, not directly on SUPPLIER_ID.",
+          "Create separate tables for STATE, CUSTOMER, and COUNTRY to eliminate all transitive dependencies."
+        ]
+      }
+    }
+  }

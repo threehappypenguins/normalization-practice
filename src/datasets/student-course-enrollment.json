@@ -1,0 +1,167 @@
+{
+  "id": "student-course-enrollment",
+  "title": "Student Course Enrollment",
+  "difficulty": "easy",
+  "description": "Normalize a table containing student information with multiple courses enrolled in the same row.",
+  "rawData": {
+    "tableName": "RAW_DATA",
+    "columns": ["STUDENT_ID", "STUDENT_NAME", "ADVISOR_ID", "ADVISOR_NAME", "ADVISOR_OFFICE", "COURSE1", "COURSE1_CREDITS", "COURSE2", "COURSE2_CREDITS"],
+    "rows": [
+      ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "CS101", "3", "MATH201", "4"],
+      ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4", "PHYS101", "3"],
+      ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105", "CS101", "3", "", ""],
+      ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "PHYS101", "3", "MATH201", "4"]
+    ]
+  },
+  "solutions": {
+    "1NF": {
+      "explanation": "Eliminate repeating course columns by creating separate rows for each course enrollment.",
+      "tables": [
+        {
+          "name": "STUDENT_ENROLLMENT",
+          "columns": [
+            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
+            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
+            { "name": "ADVISOR_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
+            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
+            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] },
+            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
+            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+          ],
+          "sampleRows": [
+            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "CS101", "3"],
+            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4"],
+            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4"],
+            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "PHYS101", "3"],
+            ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105", "CS101", "3"],
+            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "PHYS101", "3"],
+            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "MATH201", "4"]
+          ]
+        }
+      ],
+      "hints": [
+        "Notice the repeating pattern: COURSE1, COURSE2 with their respective credits.",
+        "Each student-course combination should be in its own row.",
+        "Unpivot the course columns so each enrollment becomes a separate record."
+      ]
+    },
+    "2NF": {
+      "explanation": "Remove partial dependencies: STUDENT_NAME and advisor information depend only on STUDENT_ID, while CREDITS depends on COURSE. Separate student information from enrollment and course details.",
+      "tables": [
+        {
+          "name": "STUDENT",
+          "columns": [
+            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
+            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
+            { "name": "ADVISOR_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
+            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
+            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] }
+          ],
+          "sampleRows": [
+            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201"],
+            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201"],
+            ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105"],
+            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105"]
+          ]
+        },
+        {
+          "name": "COURSE",
+          "columns": [
+            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
+            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+          ],
+          "sampleRows": [
+            ["CS101", "3"],
+            ["MATH201", "4"],
+            ["PHYS101", "3"]
+          ]
+        },
+        {
+          "name": "ENROLLMENT",
+          "columns": [
+            { "name": "STUDENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
+            { "name": "COURSE", "type": "FK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] }
+          ],
+          "sampleRows": [
+            ["S001", "CS101"],
+            ["S001", "MATH201"],
+            ["S002", "MATH201"],
+            ["S002", "PHYS101"],
+            ["S003", "CS101"],
+            ["S004", "PHYS101"],
+            ["S004", "MATH201"]
+          ]
+        }
+      ],
+      "hints": [
+        "STUDENT_NAME and advisor information depend only on STUDENT_ID, not on the course.",
+        "CREDITS depends on COURSE, not on which student is enrolled.",
+        "Create three tables: one for students, one for courses, and one for the enrollment relationship."
+      ]
+    },
+    "3NF": {
+      "explanation": "Remove transitive dependency: ADVISOR_NAME and ADVISOR_OFFICE depend on ADVISOR_ID, which is a non-key attribute in STUDENT. Create a separate ADVISOR table.",
+      "tables": [
+        {
+          "name": "ADVISOR",
+          "columns": [
+            { "name": "ADVISOR_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
+            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
+            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] }
+          ],
+          "sampleRows": [
+            ["A100", "Dr. Johnson", "Building A-201"],
+            ["A200", "Dr. Smith", "Building B-105"]
+          ]
+        },
+        {
+          "name": "STUDENT",
+          "columns": [
+            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
+            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
+            { "name": "ADVISOR_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] }
+          ],
+          "sampleRows": [
+            ["S001", "Emma Wilson", "A100"],
+            ["S002", "James Brown", "A100"],
+            ["S003", "Sarah Davis", "A200"],
+            ["S004", "Michael Chen", "A200"]
+          ]
+        },
+        {
+          "name": "COURSE",
+          "columns": [
+            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
+            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+          ],
+          "sampleRows": [
+            ["CS101", "3"],
+            ["MATH201", "4"],
+            ["PHYS101", "3"]
+          ]
+        },
+        {
+          "name": "ENROLLMENT",
+          "columns": [
+            { "name": "STUDENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
+            { "name": "COURSE", "type": "FK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] }
+          ],
+          "sampleRows": [
+            ["S001", "CS101"],
+            ["S001", "MATH201"],
+            ["S002", "MATH201"],
+            ["S002", "PHYS101"],
+            ["S003", "CS101"],
+            ["S004", "PHYS101"],
+            ["S004", "MATH201"]
+          ]
+        }
+      ],
+      "hints": [
+        "Look at the STUDENT table: ADVISOR_NAME and ADVISOR_OFFICE depend on ADVISOR_ID.",
+        "ADVISOR_ID is not the primary key, so this is a transitive dependency.",
+        "Extract advisor information into its own table and reference it from STUDENT."
+      ]
+    }
+  }
+}

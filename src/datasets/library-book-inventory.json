@@ -1,0 +1,194 @@
+{
+    "id": "library-book-inventory",
+    "title": "Library Book Inventory",
+    "difficulty": "medium",
+    "description": "Normalize a library system table with book copies, author information, publisher details, and multiple author attributions per book.",
+    "rawData": {
+      "tableName": "RAW_DATA",
+      "columns": ["ISBN", "TITLE", "AUTHOR1", "AUTHOR1_COUNTRY", "AUTHOR2", "AUTHOR2_COUNTRY", "PUBLISHER_ID", "PUBLISHER_NAME", "PUBLISHER_CITY", "COPY_ID", "SHELF_LOCATION"],
+      "rows": [
+        ["978-0-123", "Database Systems", "John Smith", "USA", "Mary Johnson", "UK", "P001", "Tech Press", "New York", "C001", "A-101"],
+        ["978-0-123", "Database Systems", "John Smith", "USA", "Mary Johnson", "UK", "P001", "Tech Press", "New York", "C002", "A-102"],
+        ["978-0-456", "Data Mining", "Susan Lee", "Canada", "", "", "P002", "Data Books Inc", "Toronto", "C003", "B-201"],
+        ["978-0-789", "AI Fundamentals", "Robert Chen", "USA", "Susan Lee", "Canada", "P001", "Tech Press", "New York", "C004", "C-301"]
+      ]
+    },
+    "solutions": {
+      "1NF": {
+        "explanation": "Eliminate repeating author groups by creating separate rows for each book-author relationship, while maintaining copy information.",
+        "tables": [
+          {
+            "name": "BOOK_INVENTORY",
+            "columns": [
+              { "name": "ISBN", "type": "PK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "TITLE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TITLE"] },
+              { "name": "AUTHOR", "type": "PK", "mappingType": "consolidate", "sourceCols": ["AUTHOR1", "AUTHOR2"] },
+              { "name": "AUTHOR_COUNTRY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["AUTHOR1_COUNTRY", "AUTHOR2_COUNTRY"] },
+              { "name": "PUBLISHER_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_ID"] },
+              { "name": "PUBLISHER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_NAME"] },
+              { "name": "PUBLISHER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_CITY"] },
+              { "name": "COPY_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["COPY_ID"] },
+              { "name": "SHELF_LOCATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SHELF_LOCATION"] }
+            ],
+            "sampleRows": [
+              ["978-0-123", "Database Systems", "John Smith", "USA", "P001", "Tech Press", "New York", "C001", "A-101"],
+              ["978-0-123", "Database Systems", "Mary Johnson", "UK", "P001", "Tech Press", "New York", "C001", "A-101"],
+              ["978-0-123", "Database Systems", "John Smith", "USA", "P001", "Tech Press", "New York", "C002", "A-102"],
+              ["978-0-123", "Database Systems", "Mary Johnson", "UK", "P001", "Tech Press", "New York", "C002", "A-102"],
+              ["978-0-456", "Data Mining", "Susan Lee", "Canada", "P002", "Data Books Inc", "Toronto", "C003", "B-201"],
+              ["978-0-789", "AI Fundamentals", "Robert Chen", "USA", "P001", "Tech Press", "New York", "C004", "C-301"],
+              ["978-0-789", "AI Fundamentals", "Susan Lee", "Canada", "P001", "Tech Press", "New York", "C004", "C-301"]
+            ]
+          }
+        ],
+        "hints": [
+          "You have repeating groups for authors: AUTHOR1, AUTHOR2 with their countries.",
+          "Each author should have their own row, but remember each book can have multiple physical copies.",
+          "The combination of ISBN, AUTHOR, and COPY_ID creates unique records."
+        ]
+      },
+      "2NF": {
+        "explanation": "Remove partial dependencies: TITLE and publisher info depend only on ISBN; AUTHOR_COUNTRY depends only on AUTHOR; SHELF_LOCATION depends only on COPY_ID. Separate books, authors, copies, and publishers.",
+        "tables": [
+          {
+            "name": "BOOK",
+            "columns": [
+              { "name": "ISBN", "type": "PK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "TITLE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TITLE"] },
+              { "name": "PUBLISHER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PUBLISHER_ID"] },
+              { "name": "PUBLISHER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_NAME"] },
+              { "name": "PUBLISHER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_CITY"] }
+            ],
+            "sampleRows": [
+              ["978-0-123", "Database Systems", "P001", "Tech Press", "New York"],
+              ["978-0-456", "Data Mining", "P002", "Data Books Inc", "Toronto"],
+              ["978-0-789", "AI Fundamentals", "P001", "Tech Press", "New York"]
+            ]
+          },
+          {
+            "name": "AUTHOR",
+            "columns": [
+              { "name": "AUTHOR", "type": "PK", "mappingType": "consolidate", "sourceCols": ["AUTHOR1", "AUTHOR2"] },
+              { "name": "AUTHOR_COUNTRY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["AUTHOR1_COUNTRY", "AUTHOR2_COUNTRY"] }
+            ],
+            "sampleRows": [
+              ["John Smith", "USA"],
+              ["Mary Johnson", "UK"],
+              ["Susan Lee", "Canada"],
+              ["Robert Chen", "USA"]
+            ]
+          },
+          {
+            "name": "BOOK_AUTHOR",
+            "columns": [
+              { "name": "ISBN", "type": "FK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "AUTHOR", "type": "FK", "mappingType": "consolidate", "sourceCols": ["AUTHOR1", "AUTHOR2"] }
+            ],
+            "sampleRows": [
+              ["978-0-123", "John Smith"],
+              ["978-0-123", "Mary Johnson"],
+              ["978-0-456", "Susan Lee"],
+              ["978-0-789", "Robert Chen"],
+              ["978-0-789", "Susan Lee"]
+            ]
+          },
+          {
+            "name": "COPY",
+            "columns": [
+              { "name": "COPY_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["COPY_ID"] },
+              { "name": "ISBN", "type": "FK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "SHELF_LOCATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SHELF_LOCATION"] }
+            ],
+            "sampleRows": [
+              ["C001", "978-0-123", "A-101"],
+              ["C002", "978-0-123", "A-102"],
+              ["C003", "978-0-456", "B-201"],
+              ["C004", "978-0-789", "C-301"]
+            ]
+          }
+        ],
+        "hints": [
+          "TITLE depends only on ISBN, not on author or copy.",
+          "AUTHOR_COUNTRY depends only on AUTHOR name.",
+          "SHELF_LOCATION depends only on COPY_ID.",
+          "Create separate tables for books, authors, their relationship, and physical copies."
+        ]
+      },
+      "3NF": {
+        "explanation": "Remove transitive dependency: PUBLISHER_NAME and PUBLISHER_CITY depend on PUBLISHER_ID, which is a non-key attribute in BOOK. Create a separate PUBLISHER table.",
+        "tables": [
+          {
+            "name": "PUBLISHER",
+            "columns": [
+              { "name": "PUBLISHER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PUBLISHER_ID"] },
+              { "name": "PUBLISHER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_NAME"] },
+              { "name": "PUBLISHER_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["PUBLISHER_CITY"] }
+            ],
+            "sampleRows": [
+              ["P001", "Tech Press", "New York"],
+              ["P002", "Data Books Inc", "Toronto"]
+            ]
+          },
+          {
+            "name": "BOOK",
+            "columns": [
+              { "name": "ISBN", "type": "PK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "TITLE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TITLE"] },
+              { "name": "PUBLISHER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PUBLISHER_ID"] }
+            ],
+            "sampleRows": [
+              ["978-0-123", "Database Systems", "P001"],
+              ["978-0-456", "Data Mining", "P002"],
+              ["978-0-789", "AI Fundamentals", "P001"]
+            ]
+          },
+          {
+            "name": "AUTHOR",
+            "columns": [
+              { "name": "AUTHOR", "type": "PK", "mappingType": "consolidate", "sourceCols": ["AUTHOR1", "AUTHOR2"] },
+              { "name": "AUTHOR_COUNTRY", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["AUTHOR1_COUNTRY", "AUTHOR2_COUNTRY"] }
+            ],
+            "sampleRows": [
+              ["John Smith", "USA"],
+              ["Mary Johnson", "UK"],
+              ["Susan Lee", "Canada"],
+              ["Robert Chen", "USA"]
+            ]
+          },
+          {
+            "name": "BOOK_AUTHOR",
+            "columns": [
+              { "name": "ISBN", "type": "FK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "AUTHOR", "type": "FK", "mappingType": "consolidate", "sourceCols": ["AUTHOR1", "AUTHOR2"] }
+            ],
+            "sampleRows": [
+              ["978-0-123", "John Smith"],
+              ["978-0-123", "Mary Johnson"],
+              ["978-0-456", "Susan Lee"],
+              ["978-0-789", "Robert Chen"],
+              ["978-0-789", "Susan Lee"]
+            ]
+          },
+          {
+            "name": "COPY",
+            "columns": [
+              { "name": "COPY_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["COPY_ID"] },
+              { "name": "ISBN", "type": "FK", "mappingType": "direct", "sourceCols": ["ISBN"] },
+              { "name": "SHELF_LOCATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SHELF_LOCATION"] }
+            ],
+            "sampleRows": [
+              ["C001", "978-0-123", "A-101"],
+              ["C002", "978-0-123", "A-102"],
+              ["C003", "978-0-456", "B-201"],
+              ["C004", "978-0-789", "C-301"]
+            ]
+          }
+        ],
+        "hints": [
+          "Look at the BOOK table: PUBLISHER_NAME and PUBLISHER_CITY depend on PUBLISHER_ID.",
+          "PUBLISHER_ID is not the primary key, so this is a transitive dependency.",
+          "Extract publisher information into its own table and reference it from BOOK."
+        ]
+      }
+    }
+  }
