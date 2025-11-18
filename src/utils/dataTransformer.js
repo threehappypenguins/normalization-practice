@@ -31,7 +31,7 @@ export function generateTableData(table, rawData) {
   // If we have consolidation columns, we need to "unpivot" the data
   if (consolidationColumns.length > 0) {
     // Use the first consolidation column's source columns as the master list
-    // All consolidation/metadata columns should use the same source columns
+    // All consolidation/metadata columns should use the same source columns (same positions)
     const masterSourceCols = consolidationColumns[0].sourceCols;
     const masterSourceColIndices = masterSourceCols.map(colName => 
       rawColumns.indexOf(colName)
@@ -55,10 +55,15 @@ export function generateTableData(table, rawData) {
               const sourceColIndex = rawColumns.indexOf(col.sourceCols[0]);
               newRow.push(sourceColIndex !== -1 ? rawRow[sourceColIndex] : '');
             } else if (col.mappingType === 'consolidate') {
-              // Consolidation: get value from the current source column being processed
-              // Find the index of the current source column in this consolidation column's sourceCols
-              const currentSourceColIndex = rawColumns.indexOf(sourceColName);
-              newRow.push(currentSourceColIndex !== -1 ? rawRow[currentSourceColIndex] : '');
+              // Consolidation: get value from the corresponding source column
+              // Find the source column at the same position in this consolidation column's sourceCols
+              if (col.sourceCols && col.sourceCols.length > sourceIdx) {
+                const correspondingSourceCol = col.sourceCols[sourceIdx];
+                const correspondingSourceColIndex = rawColumns.indexOf(correspondingSourceCol);
+                newRow.push(correspondingSourceColIndex !== -1 ? rawRow[correspondingSourceColIndex] : '');
+              } else {
+                newRow.push('');
+              }
             } else if (col.mappingType === 'metadata') {
               // Metadata: use the source column name as the value
               newRow.push(sourceColName || '');
