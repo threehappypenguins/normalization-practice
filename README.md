@@ -211,31 +211,6 @@ After creating your dataset file:
    - Hints are helpful
    - The progression makes sense
 
-## Project Structure
-
-```
-normalization-practice/
-├── src/
-│   ├── components/          # React components
-│   │   ├── DatasetSelector.jsx
-│   │   ├── RawDataView.jsx
-│   │   ├── TableBuilder.jsx
-│   │   ├── HelpSystem.jsx
-│   │   └── ValidationFeedback.jsx
-│   ├── datasets/            # Dataset JSON files
-│   │   ├── flight-charter.json
-│   │   └── template.json
-│   ├── utils/               # Utility functions
-│   │   ├── datasetLoader.js
-│   │   └── validator.js
-│   ├── App.jsx             # Main application component
-│   ├── main.jsx            # Application entry point
-│   └── index.css           # Global styles
-├── package.json
-├── vite.config.js
-└── README.md
-```
-
 ## Technologies Used
 
 - **React**: UI framework
