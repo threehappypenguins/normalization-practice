@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ColumnMappingDialog from './ColumnMappingDialog';
 import { generateTableData, getMappedColumns } from '../utils/dataTransformer';
 
@@ -7,12 +7,34 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
   const [currentTableId, setCurrentTableId] = useState(null);
   const [editingColumnIndex, setEditingColumnIndex] = useState(null); // Track which column is being edited
   const [previewData, setPreviewData] = useState({});
-  const [savedTables, setSavedTables] = useState(new Set()); // Track which tables are saved/collapsed
+  
+  // Initialize savedTables from tables that have saved property
+  const [savedTables, setSavedTables] = useState(() => {
+    const saved = new Set();
+    tables.forEach(table => {
+      if (table.saved) {
+        saved.add(table.id);
+      }
+    });
+    return saved;
+  });
+  
+  // Update savedTables when tables change (e.g., loaded from localStorage)
+  React.useEffect(() => {
+    const saved = new Set();
+    tables.forEach(table => {
+      if (table.saved) {
+        saved.add(table.id);
+      }
+    });
+    setSavedTables(saved);
+  }, [tables]); // Update when tables array changes
 
   const addTable = () => {
     const newTable = {
       id: Date.now(),
       name: `TABLE_${tables.length + 1}`,
+      saved: false, // New tables are not saved by default
       columns: []
     };
     onTablesChange([...tables, newTable]);
@@ -105,6 +127,56 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
 
   const [draggedColumn, setDraggedColumn] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const dragScrollIntervalRef = useRef(null);
+  
+  // Global drag event listener for auto-scrolling
+  useEffect(() => {
+    const handleGlobalDrag = (e) => {
+      if (draggedColumn === null) return; // Only scroll if we're dragging a column
+      
+      const scrollThreshold = 100; // pixels from edge
+      const scrollSpeed = 10; // pixels per interval
+      const viewportHeight = window.innerHeight;
+      const mouseY = e.clientY;
+      
+      // Clear any existing scroll interval
+      if (dragScrollIntervalRef.current) {
+        clearInterval(dragScrollIntervalRef.current);
+        dragScrollIntervalRef.current = null;
+      }
+      
+      // Check if near top or bottom of viewport
+      if (mouseY < scrollThreshold) {
+        // Near top - scroll up
+        dragScrollIntervalRef.current = setInterval(() => {
+          window.scrollBy(0, -scrollSpeed);
+        }, 16); // ~60fps
+      } else if (mouseY > viewportHeight - scrollThreshold) {
+        // Near bottom - scroll down
+        dragScrollIntervalRef.current = setInterval(() => {
+          window.scrollBy(0, scrollSpeed);
+        }, 16);
+      }
+    };
+    
+    const stopAutoScroll = () => {
+      if (dragScrollIntervalRef.current) {
+        clearInterval(dragScrollIntervalRef.current);
+        dragScrollIntervalRef.current = null;
+      }
+    };
+    
+    if (draggedColumn !== null) {
+      document.addEventListener('dragover', handleGlobalDrag);
+      document.addEventListener('dragend', stopAutoScroll);
+    }
+    
+    return () => {
+      document.removeEventListener('dragover', handleGlobalDrag);
+      document.removeEventListener('dragend', stopAutoScroll);
+      stopAutoScroll();
+    };
+  }, [draggedColumn]);
 
   const generatePreviewForTable = (tableId) => {
     if (!rawData) return;
@@ -176,6 +248,10 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
   const handleSaveTable = (tableId) => {
     generatePreviewForTable(tableId);
     setSavedTables(prev => new Set(prev).add(tableId));
+    // Update the table object to mark it as saved
+    onTablesChange(tables.map(t => 
+      t.id === tableId ? { ...t, saved: true } : t
+    ));
   };
 
   const handleEditTable = (tableId) => {
@@ -184,6 +260,10 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
       newSet.delete(tableId);
       return newSet;
     });
+    // Update the table object to mark it as not saved
+    onTablesChange(tables.map(t => 
+      t.id === tableId ? { ...t, saved: false } : t
+    ));
   };
 
   return (
@@ -212,14 +292,17 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
           <div key={table.id} className="bg-white rounded-lg shadow-md p-6 border-2 border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <div className="flex-1">
-                <input
-                  type="text"
-                  value={table.name}
-                  onChange={(e) => updateTableName(table.id, e.target.value)}
-                  placeholder="Table Name"
-                  className="text-lg font-semibold px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full mb-2"
-                />
-                <p className="text-sm text-gray-600">Table: {table.name || 'Untitled'}</p>
+                {isTableSaved(table.id) ? (
+                  <h4 className="text-lg font-semibold text-gray-800">{table.name || 'Untitled'}</h4>
+                ) : (
+                  <input
+                    type="text"
+                    value={table.name}
+                    onChange={(e) => updateTableName(table.id, e.target.value)}
+                    placeholder="Table Name"
+                    className="text-lg font-semibold px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                  />
+                )}
               </div>
               <div className="flex gap-2 ml-4">
                 {isTableSaved(table.id) ? (
@@ -263,38 +346,50 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                   <p className="text-sm text-gray-500 italic">No columns yet. Add columns to define the table structure.</p>
                 )}
 
-                {table.columns.map((column, colIdx) => (
-                  <div 
-                    key={colIdx} 
-                    className={`p-3 bg-gray-50 rounded border border-gray-200 cursor-move ${
-                      draggedColumn === colIdx ? 'opacity-50' : ''
-                    } ${dragOverIndex === colIdx ? 'border-blue-500 border-2' : ''}`}
-                    draggable
-                    onDragStart={(e) => {
-                      setDraggedColumn(colIdx);
-                      e.dataTransfer.effectAllowed = 'move';
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.dataTransfer.dropEffect = 'move';
-                      setDragOverIndex(colIdx);
-                    }}
-                    onDragLeave={() => {
-                      setDragOverIndex(null);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (draggedColumn !== null && draggedColumn !== colIdx) {
-                        moveColumn(table.id, draggedColumn, colIdx);
-                      }
-                      setDraggedColumn(null);
-                      setDragOverIndex(null);
-                    }}
-                    onDragEnd={() => {
-                      setDraggedColumn(null);
-                      setDragOverIndex(null);
-                    }}
-                  >
+                {table.columns.map((column, colIdx) => {
+                  const handleDragOver = (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    setDragOverIndex(colIdx);
+                  };
+                  
+                  const handleDragLeave = () => {
+                    setDragOverIndex(null);
+                  };
+                  
+                  const handleDragEnd = () => {
+                    setDraggedColumn(null);
+                    setDragOverIndex(null);
+                  };
+                  
+                  return (
+                    <div 
+                      key={colIdx} 
+                      className={`p-3 bg-gray-50 rounded border border-gray-200 cursor-move ${
+                        draggedColumn === colIdx ? 'opacity-50' : ''
+                      } ${dragOverIndex === colIdx ? 'border-blue-500 border-2' : ''}`}
+                      draggable
+                      onDragStart={(e) => {
+                        setDraggedColumn(colIdx);
+                        e.dataTransfer.effectAllowed = 'move';
+                      }}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        // Stop auto-scrolling
+                        if (dragScrollIntervalRef.current) {
+                          clearInterval(dragScrollIntervalRef.current);
+                          dragScrollIntervalRef.current = null;
+                        }
+                        if (draggedColumn !== null && draggedColumn !== colIdx) {
+                          moveColumn(table.id, draggedColumn, colIdx);
+                        }
+                        setDraggedColumn(null);
+                        setDragOverIndex(null);
+                      }}
+                      onDragEnd={handleDragEnd}
+                    >
                     <div className="flex items-start gap-2 mb-2">
                       <div className="cursor-move text-gray-400 hover:text-gray-600 mr-1">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,7 +436,8 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -355,16 +451,39 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                   <table className="min-w-full border-collapse border border-gray-300 text-sm">
                     <thead>
                       <tr className="bg-gray-100">
-                        {table.columns.map((col, idx) => (
-                          <th
-                            key={idx}
-                            className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700"
-                          >
-                            {col.name}
-                            {col.type === 'PK' && <span className="text-green-600 ml-1">(PK)</span>}
-                            {col.type === 'FK' && <span className="text-blue-600 ml-1">(FK)</span>}
-                          </th>
-                        ))}
+                        {(() => {
+                          // Count PKs and FKs for numbering
+                          let pkCount = 0;
+                          let fkCount = 0;
+                          return table.columns.map((col, idx) => {
+                            let label = null;
+                            if (col.type === 'PK') {
+                              pkCount++;
+                              label = pkCount > 1 ? `PK${pkCount}` : 'PK';
+                            } else if (col.type === 'FK') {
+                              fkCount++;
+                              label = fkCount > 1 ? `FK${fkCount}` : 'FK';
+                            }
+                            return (
+                              <th
+                                key={idx}
+                                className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700"
+                              >
+                                <div className="flex items-center gap-1">
+                                  <span>{col.name}</span>
+                                  {label && (
+                                    <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                                      col.type === 'PK' ? 'bg-green-100 text-green-800' :
+                                      'bg-blue-100 text-blue-800'
+                                    }`}>
+                                      {label}
+                                    </span>
+                                  )}
+                                </div>
+                              </th>
+                            );
+                          });
+                        })()}
                       </tr>
                     </thead>
                     <tbody>

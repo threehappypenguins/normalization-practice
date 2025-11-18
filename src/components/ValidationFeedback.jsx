@@ -15,11 +15,17 @@ export default function ValidationFeedback({ validationResult, onCheckAnswer }) 
   }
 
   const { isValid, errors, warnings, tableDetails } = validationResult;
+  
+  // Check if the error is about unsaved tables
+  const unsavedTablesError = errors && errors.length > 0 && 
+    errors.some(err => err.includes('save all tables') || err.includes('need to be saved'));
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <div className={`p-4 rounded-lg mb-4 ${
-        isValid ? 'bg-green-50 border-2 border-green-400' : 'bg-red-50 border-2 border-red-400'
+        isValid ? 'bg-green-50 border-2 border-green-400' : 
+        unsavedTablesError ? 'bg-yellow-50 border-2 border-yellow-400' : 
+        'bg-red-50 border-2 border-red-400'
       }`}>
         <div className="flex items-center gap-3">
           {isValid ? (
@@ -30,6 +36,16 @@ export default function ValidationFeedback({ validationResult, onCheckAnswer }) 
               <div>
                 <h3 className="text-xl font-bold text-green-800">Correct!</h3>
                 <p className="text-green-700">Your normalization is correct. Great job!</p>
+              </div>
+            </>
+          ) : unsavedTablesError ? (
+            <>
+              <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="text-xl font-bold text-yellow-800">Unsaved Tables</h3>
+                <p className="text-yellow-700">You have tables that are still in edit mode. Please save all tables before checking your answer.</p>
               </div>
             </>
           ) : (
@@ -45,6 +61,21 @@ export default function ValidationFeedback({ validationResult, onCheckAnswer }) 
           )}
         </div>
       </div>
+
+      {errors && errors.length > 0 && (
+        <div className="mb-4">
+          <h4 className="font-semibold text-gray-800 mb-2">Issues:</h4>
+          <ul className="list-disc list-inside space-y-1">
+            {errors.map((error, errIdx) => (
+              <li key={errIdx} className={`text-sm ${
+                unsavedTablesError ? 'text-yellow-700 font-medium' : 'text-red-700'
+              }`}>
+                {error}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {tableDetails.length > 0 && (
         <div className="mb-4">

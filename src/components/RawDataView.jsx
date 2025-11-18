@@ -82,16 +82,10 @@ export default function RawDataView({ rawData, mappedColumns = [], mappingStats 
         </table>
       </div>
       
-      <div className="mt-4 flex items-start gap-4">
-        <p className="text-sm text-gray-600 italic flex-1">
+      <div className="mt-4">
+        <p className="text-sm text-gray-600 italic">
           This is the un-normalized data. Your task is to normalize it step by step.
         </p>
-        {mappingStats && mappingStats.unmappedColumns.length > 0 && (
-          <div className="text-xs text-gray-500">
-            <span className="font-medium">Unmapped:</span>{' '}
-            {mappingStats.unmappedColumns.join(', ')}
-          </div>
-        )}
       </div>
     </div>
   );

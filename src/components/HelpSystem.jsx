@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function HelpSystem({ solution, currentForm }) {
+export default function HelpSystem({ solution, currentForm, onGenerateTables }) {
   const [hintLevel, setHintLevel] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
 
@@ -103,37 +103,59 @@ export default function HelpSystem({ solution, currentForm }) {
               </div>
 
               <div className="space-y-4">
-                <h5 className="font-semibold text-gray-800">Correct Solution:</h5>
-                {solution.tables.map((table, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <h6 className="font-semibold text-lg text-gray-800 mb-2">{table.name}</h6>
-                    <div className="space-y-1 mb-3">
-                      {table.columns.map((col, colIdx) => (
-                        <div key={colIdx} className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">{col.name}</span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            col.type === 'PK' ? 'bg-green-100 text-green-800' :
-                            col.type === 'FK' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {col.type}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {table.sampleRows && table.sampleRows.length > 0 && (
-                      <div className="mt-3">
-                        <p className="text-xs font-medium text-gray-600 mb-2">Sample Data:</p>
+                <div className="flex items-center justify-between">
+                  <h5 className="font-semibold text-gray-800">Correct Solution:</h5>
+                  {onGenerateTables && (
+                    <button
+                      onClick={() => onGenerateTables(solution.tables)}
+                      className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      Generate Tables
+                    </button>
+                  )}
+                </div>
+                {solution.tables.map((table, idx) => {
+                  // Count PKs and FKs for numbering
+                  let pkCount = 0;
+                  let fkCount = 0;
+                  const columnLabels = table.columns.map(col => {
+                    if (col.type === 'PK') {
+                      pkCount++;
+                      return { ...col, label: pkCount > 1 ? `PK${pkCount}` : 'PK' };
+                    } else if (col.type === 'FK') {
+                      fkCount++;
+                      return { ...col, label: fkCount > 1 ? `FK${fkCount}` : 'FK' };
+                    }
+                    return { ...col, label: null };
+                  });
+
+                  return (
+                    <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <h6 className="font-semibold text-lg text-gray-800 mb-3">{table.name}</h6>
+                      
+                      {table.sampleRows && table.sampleRows.length > 0 && (
                         <div className="overflow-x-auto">
-                          <table className="min-w-full text-xs border-collapse">
+                          <table className="min-w-full text-xs border-collapse border border-gray-300">
                             <thead>
                               <tr className="bg-gray-200">
-                                {table.columns.map((col, colIdx) => (
-                                  <th key={colIdx} className="border border-gray-300 px-2 py-1 text-left">
-                                    {col.name}
-                                  </th>
-                                ))}
+                                {table.columns.map((col, colIdx) => {
+                                  const label = columnLabels[colIdx].label;
+                                  return (
+                                    <th key={colIdx} className="border border-gray-300 px-2 py-1 text-left">
+                                      <div className="flex items-center gap-1">
+                                        <span>{col.name}</span>
+                                        {label && (
+                                          <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                                            col.type === 'PK' ? 'bg-green-100 text-green-800' :
+                                            'bg-blue-100 text-blue-800'
+                                          }`}>
+                                            {label}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </th>
+                                  );
+                                })}
                               </tr>
                             </thead>
                             <tbody>
@@ -149,10 +171,10 @@ export default function HelpSystem({ solution, currentForm }) {
                             </tbody>
                           </table>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
