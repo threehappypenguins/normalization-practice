@@ -12,49 +12,75 @@ function normalizeName(name) {
 
 /**
  * Find matching column in solution (flexible name matching)
+ * Returns the best matching column, prioritizing exact matches
  */
 function findMatchingColumn(userColName, solutionColumns) {
   const userNormalized = normalizeName(userColName);
   
+  // First pass: look for exact matches
   for (const solutionCol of solutionColumns) {
     const solutionNormalized = normalizeName(solutionCol.name);
-    
-    // Exact match
     if (userNormalized === solutionNormalized) {
       return solutionCol;
     }
-    
-    // One contains the other (e.g., "CREW_MEM" matches "CREW_MEMBER")
-    if (userNormalized.includes(solutionNormalized) || solutionNormalized.includes(userNormalized)) {
+  }
+  
+  // Second pass: look for prefix/suffix matches (one starts/ends with the other)
+  // This handles cases like "CREW_MEM" matching "CREW_MEMBER"
+  for (const solutionCol of solutionColumns) {
+    const solutionNormalized = normalizeName(solutionCol.name);
+    if (userNormalized.startsWith(solutionNormalized) || solutionNormalized.startsWith(userNormalized)) {
       return solutionCol;
     }
-    
-    // Word-based matching
-    const userWords = userNormalized.split(/[_\s]+/).filter(w => w.length > 0);
+    if (userNormalized.endsWith(solutionNormalized) || solutionNormalized.endsWith(userNormalized)) {
+      return solutionCol;
+    }
+  }
+  
+  // Third pass: word-based matching (more flexible but less preferred)
+  const userWords = userNormalized.split(/[_\s]+/).filter(w => w.length > 0);
+  
+  let bestMatch = null;
+  let bestScore = 0;
+  
+  for (const solutionCol of solutionColumns) {
+    const solutionNormalized = normalizeName(solutionCol.name);
     const solutionWords = solutionNormalized.split(/[_\s]+/).filter(w => w.length > 0);
     
     if (userWords.length > 0 && solutionWords.length > 0) {
-      const allUserWordsMatch = userWords.every(userWord => 
+      // Calculate match score based on word overlap
+      const matchingWords = userWords.filter(userWord => 
         solutionWords.some(solWord => 
           userWord === solWord || 
           userWord.startsWith(solWord) || 
-          solWord.startsWith(userWord) ||
-          userWord.includes(solWord) ||
-          solWord.includes(userWord)
+          solWord.startsWith(userWord)
         )
-      );
+      ).length;
       
-      const allSolutionWordsMatch = solutionWords.every(solWord =>
-        userWords.some(userWord =>
-          solWord === userWord ||
-          solWord.startsWith(userWord) ||
-          userWord.startsWith(solWord) ||
-          solWord.includes(userWord) ||
-          userWord.includes(solWord)
-        )
-      );
+      const score = matchingWords / Math.max(userWords.length, solutionWords.length);
       
-      if (allUserWordsMatch || allSolutionWordsMatch) {
+      // Only consider it a match if most words match
+      if (score > 0.5 && score > bestScore) {
+        bestScore = score;
+        bestMatch = solutionCol;
+      }
+    }
+  }
+  
+  if (bestMatch) {
+    return bestMatch;
+  }
+  
+  // Last resort: substring matching (but be very careful)
+  // Only match if one is clearly a subset (at least 3 characters and 70% of the shorter string)
+  for (const solutionCol of solutionColumns) {
+    const solutionNormalized = normalizeName(solutionCol.name);
+    const shorter = userNormalized.length < solutionNormalized.length ? userNormalized : solutionNormalized;
+    const longer = userNormalized.length >= solutionNormalized.length ? userNormalized : solutionNormalized;
+    
+    if (shorter.length >= 3 && longer.includes(shorter)) {
+      const overlapRatio = shorter.length / longer.length;
+      if (overlapRatio >= 0.7) {
         return solutionCol;
       }
     }
@@ -382,23 +408,35 @@ export function validateSolution(userTables, solutionTables) {
         }
       }
       
-      if (bestMatch) {
-        matchedSolutionTables.add(bestMatch);
-        
-        if (bestValidation.errors.length > 0) {
-          result.isValid = false;
+        if (bestMatch) {
+          matchedSolutionTables.add(bestMatch);
+          
+          if (bestValidation.errors.length > 0) {
+            result.isValid = false;
+          }
+          
+          // Only add errors to main list if they're not column-specific (to avoid duplication)
+          // Column-specific errors will be shown in tableDetails
+          const columnSpecificErrors = bestValidation.errors.filter(e => 
+            e.includes('should be a') || 
+            e.includes('should use') || 
+            e.includes('should include source column') ||
+            e.includes('should map to') ||
+            e.includes('is missing source column')
+          );
+          const generalErrors = bestValidation.errors.filter(e => !columnSpecificErrors.includes(e));
+          
+          // Add general errors to main list with table name prefix
+          allErrors.push(...generalErrors.map(e => `${userTable.name}: ${e}`));
+          allWarnings.push(...bestValidation.warnings.map(w => `${userTable.name}: ${w}`));
+          
+          result.tableDetails.push({
+            tableName: userTable.name,
+            isValid: bestValidation.errors.length === 0,
+            errors: bestValidation.errors, // Show all errors in table details
+            warnings: bestValidation.warnings
+          });
         }
-        
-        allErrors.push(...bestValidation.errors.map(e => `${userTable.name}: ${e}`));
-        allWarnings.push(...bestValidation.warnings.map(w => `${userTable.name}: ${w}`));
-        
-        result.tableDetails.push({
-          tableName: userTable.name,
-          isValid: bestValidation.errors.length === 0,
-          errors: bestValidation.errors,
-          warnings: bestValidation.warnings
-        });
-      }
     }
   });
   

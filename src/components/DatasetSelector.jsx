@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { getProgress, isFormCompleted } from '../utils/validator';
 
 export default function DatasetSelector({ datasets, selectedDataset, onSelectDataset, onDatasetsUpdate }) {
   const [filterDifficulty, setFilterDifficulty] = React.useState('all');
@@ -8,6 +9,15 @@ export default function DatasetSelector({ datasets, selectedDataset, onSelectDat
   const filteredDatasets = filterDifficulty === 'all' 
     ? datasets 
     : datasets.filter(d => d.difficulty === filterDifficulty);
+  
+  const progress = getProgress();
+  
+  const getDatasetProgress = (datasetId) => {
+    const datasetProgress = progress[datasetId] || {};
+    const forms = ['1NF', '2NF', '3NF'];
+    const completed = forms.filter(form => datasetProgress[form] === true).length;
+    return { completed, total: forms.length, forms };
+  };
 
   const validateDataset = (dataset) => {
     const errors = [];
@@ -177,14 +187,35 @@ export default function DatasetSelector({ datasets, selectedDataset, onSelectDat
                     )}
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{dataset.description}</p>
+                  {(() => {
+                    const { completed, total } = getDatasetProgress(dataset.id);
+                    if (completed > 0) {
+                      return (
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
+                            <div 
+                              className="bg-green-500 h-2 rounded-full transition-all"
+                              style={{ width: `${(completed / total) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">
+                            {completed}/{total} forms completed
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
-                <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${
-                  dataset.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                  dataset.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {dataset.difficulty.toUpperCase()}
-                </span>
+                <div className="ml-4 flex flex-col items-end gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    dataset.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
+                    dataset.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {dataset.difficulty.toUpperCase()}
+                  </span>
+                </div>
               </div>
             </button>
             {dataset.isUploaded && (
