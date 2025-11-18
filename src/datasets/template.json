@@ -1,0 +1,79 @@
+{
+  "id": "dataset-id",
+  "title": "Dataset Title",
+  "difficulty": "easy|medium|hard",
+  "description": "Brief description of the normalization problem",
+  "rawData": {
+    "tableName": "RAW_DATA",
+    "columns": ["COLUMN1", "COLUMN2", "COLUMN3"],
+    "rows": [
+      ["value1", "value2", "value3"],
+      ["value4", "value5", "value6"]
+    ]
+  },
+  "solutions": {
+    "1NF": {
+      "explanation": "Explanation of why this is the correct 1NF solution",
+      "tables": [
+        {
+          "name": "TABLE_NAME",
+          "columns": [
+            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
+            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
+            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+          ],
+          "sampleRows": [
+            ["value1", "value2", "value3"]
+          ]
+        }
+      ],
+      "hints": [
+        "First hint: General guidance",
+        "Second hint: More specific direction",
+        "Third hint: Very specific guidance"
+      ]
+    },
+    "2NF": {
+      "explanation": "Explanation of why this is the correct 2NF solution",
+      "tables": [
+        {
+          "name": "TABLE_NAME",
+          "columns": [
+            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
+            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
+            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+          ],
+          "sampleRows": [
+            ["value1", "value2", "value3"]
+          ]
+        }
+      ],
+      "hints": [
+        "First hint: General guidance",
+        "Second hint: More specific direction",
+        "Third hint: Very specific guidance"
+      ]
+    },
+    "3NF": {
+      "explanation": "Explanation of why this is the correct 3NF solution",
+      "tables": [
+        {
+          "name": "TABLE_NAME",
+          "columns": [
+            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
+            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
+            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+          ],
+          "sampleRows": [
+            ["value1", "value2", "value3"]
+          ]
+        }
+      ],
+      "hints": [
+        "First hint: General guidance",
+        "Second hint: More specific direction",
+        "Third hint: Very specific guidance"
+      ]
+    }
+  }
+}

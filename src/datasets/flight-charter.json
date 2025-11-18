@@ -1,0 +1,191 @@
+{
+    "id": "flight-charter",
+    "title": "Flight Charter Service",
+    "difficulty": "medium",
+    "description": "Normalize flight charter data with crew assignments and aircraft information",
+    "rawData": {
+      "tableName": "RAW_DATA",
+      "columns": ["CHAR_TRIP", "CHAR_DATE", "CHAR_CITY", "CHAR_MILES", "CUST_NUM", "CUST_LNAME", "CHAR_PAX", "CHAR_CARGO", "PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER", "AC_NUMBER", "MODEL_CODE", "MODEL_SEATS", "MODEL_CHG_MILE"],
+      "rows": [
+        ["10232", "2018-01-15", "STL", "580", "784", "Brown", "5", "235 lbs.", "Melton", "", "", "", "1234Q", "PA31-350", "10", "$2.79"],
+        ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "Chen", "Henderson", "O'Shaski", "Benkasi", "3456Y", "CV-580", "38", "$23.36"],
+        ["10234", "2018-01-16", "TYS", "524", "544", "Bryana", "2", "348 lbs.", "Henderson", "Melton", "", "", "1234Q", "PA31-350", "10", "$2.79"],
+        ["10235", "2018-01-17", "ATL", "768", "784", "Brown", "5", "155 lbs.", "Melton", "", "", "", "2256W", "PA31-350", "10", "$2.79"]
+      ]
+    },
+    "solutions": {
+      "1NF": {
+        "explanation": "First Normal Form (1NF) eliminates repeating groups. The original table has repeating crew member columns (PILOT, COPILOT, FLT_ENGINEER, LOAD_MASTER) which violate 1NF. We consolidate these into separate rows with CREW_MEMBER and CREW_ROLE columns. At this stage, we still have all the data together - we haven't separated entities yet.",
+        "tables": [
+          {
+            "name": "FLIGHT_DETAILS",
+            "columns": [
+              {"name": "CHAR_TRIP", "type": "PK", "mappingType": "direct", "sourceCols": ["CHAR_TRIP"]},
+              {"name": "CHAR_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_DATE"]},
+              {"name": "CHAR_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CITY"]},
+              {"name": "CHAR_MILES", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_MILES"]},
+              {"name": "CUST_NUM", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUST_NUM"]},
+              {"name": "CUST_LNAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUST_LNAME"]},
+              {"name": "CHAR_PAX", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_PAX"]},
+              {"name": "CHAR_CARGO", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CARGO"]},
+              {"name": "CREW_MEMBER", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]},
+              {"name": "CREW_ROLE", "type": "attribute", "mappingType": "metadata", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]},
+              {"name": "AC_NUMBER", "type": "attribute", "mappingType": "direct", "sourceCols": ["AC_NUMBER"]},
+              {"name": "MODEL_CODE", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_CODE"]},
+              {"name": "MODEL_SEATS", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_SEATS"]},
+              {"name": "MODEL_CHG_MILE", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_CHG_MILE"]}
+            ],
+            "sampleRows": [
+              ["10232", "2018-01-15", "STL", "580", "784", "Brown", "5", "235 lbs.", "Melton", "PILOT", "1234Q", "PA31-350", "10", "$2.79"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "Chen", "PILOT", "3456Y", "CV-580", "38", "$23.36"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "Henderson", "COPILOT", "3456Y", "CV-580", "38", "$23.36"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "O'Shaski", "FLT_ENGINEER", "3456Y", "CV-580", "38", "$23.36"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "Benkasi", "LOAD_MASTER", "3456Y", "CV-580", "38", "$23.36"],
+              ["10234", "2018-01-16", "TYS", "524", "544", "Bryana", "2", "348 lbs.", "Henderson", "PILOT", "1234Q", "PA31-350", "10", "$2.79"],
+              ["10234", "2018-01-16", "TYS", "524", "544", "Bryana", "2", "348 lbs.", "Melton", "COPILOT", "1234Q", "PA31-350", "10", "$2.79"],
+              ["10235", "2018-01-17", "ATL", "768", "784", "Brown", "5", "155 lbs.", "Melton", "PILOT", "2256W", "PA31-350", "10", "$2.79"]
+            ]
+          }
+        ],
+        "hints": [
+          "Look for columns that contain multiple values or repeating groups. The PILOT, COPILOT, FLT_ENGINEER, and LOAD_MASTER columns are repeating groups.",
+          "In 1NF, we eliminate repeating groups by creating separate rows. Each crew member should have their own row.",
+          "Create one table with all the data, but 'unpivot' the crew columns so each crew member gets their own row. You'll need CREW_MEMBER (for the person's name) and CREW_ROLE (for their job) columns."
+        ]
+      },
+      "2NF": {
+        "explanation": "Second Normal Form (2NF) eliminates partial dependencies. The composite primary key is (CHAR_TRIP, CREW_MEMBER). Flight information depends only on CHAR_TRIP (partial dependency), so we separate it. We also notice that aircraft model information depends only on AC_NUMBER, and customer information appears with both customer and flight data.",
+        "tables": [
+          {
+            "name": "FLIGHT_CREW",
+            "columns": [
+              {"name": "CHAR_TRIP", "type": "PK", "mappingType": "direct", "sourceCols": ["CHAR_TRIP"]},
+              {"name": "CREW_MEMBER", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]},
+              {"name": "CREW_ROLE", "type": "attribute", "mappingType": "metadata", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]}
+            ],
+            "sampleRows": [
+              ["10232", "Melton", "PILOT"],
+              ["10233", "Chen", "PILOT"],
+              ["10233", "Henderson", "COPILOT"],
+              ["10233", "O'Shaski", "FLT_ENGINEER"],
+              ["10233", "Benkasi", "LOAD_MASTER"],
+              ["10234", "Henderson", "PILOT"],
+              ["10234", "Melton", "COPILOT"],
+              ["10235", "Melton", "PILOT"]
+            ]
+          },
+          {
+            "name": "FLIGHT_DETAILS",
+            "columns": [
+              {"name": "CHAR_TRIP", "type": "PK", "mappingType": "direct", "sourceCols": ["CHAR_TRIP"]},
+              {"name": "CHAR_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_DATE"]},
+              {"name": "CHAR_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CITY"]},
+              {"name": "CHAR_MILES", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_MILES"]},
+              {"name": "CUST_NUM", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUST_NUM"]},
+              {"name": "CUST_LNAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUST_LNAME"]},
+              {"name": "CHAR_PAX", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_PAX"]},
+              {"name": "CHAR_CARGO", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CARGO"]},
+              {"name": "AC_NUMBER", "type": "attribute", "mappingType": "direct", "sourceCols": ["AC_NUMBER"]},
+              {"name": "MODEL_CODE", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_CODE"]},
+              {"name": "MODEL_SEATS", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_SEATS"]},
+              {"name": "MODEL_CHG_MILE", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_CHG_MILE"]}
+            ],
+            "sampleRows": [
+              ["10232", "2018-01-15", "STL", "580", "784", "Brown", "5", "235 lbs.", "1234Q", "PA31-350", "10", "$2.79"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "Hanson", "12", "18940 lbs.", "3456Y", "CV-580", "38", "$23.36"],
+              ["10234", "2018-01-16", "TYS", "524", "544", "Bryana", "2", "348 lbs.", "1234Q", "PA31-350", "10", "$2.79"],
+              ["10235", "2018-01-17", "ATL", "768", "784", "Brown", "5", "155 lbs.", "2256W", "PA31-350", "10", "$2.79"]
+            ]
+          }
+        ],
+        "hints": [
+          "Look for partial dependencies. With a composite key (CHAR_TRIP, CREW_MEMBER), some data depends only on CHAR_TRIP.",
+          "Flight details like date, city, miles only depend on CHAR_TRIP, not on which crew member you're looking at. This is a partial dependency.",
+          "Separate the crew assignments from the flight information. Crew assignments need both CHAR_TRIP and CREW_MEMBER as the key."
+        ]
+      },
+      "3NF": {
+        "explanation": "Third Normal Form (3NF) eliminates transitive dependencies. In FLIGHT_DETAILS, CUST_LNAME depends on CUST_NUM (not directly on CHAR_TRIP), and MODEL_CODE, MODEL_SEATS, MODEL_CHG_MILE depend on AC_NUMBER (not directly on CHAR_TRIP). These are transitive dependencies that should be separated.",
+        "tables": [
+          {
+            "name": "CREW",
+            "columns": [
+              {"name": "CHAR_TRIP", "type": "PK", "mappingType": "direct", "sourceCols": ["CHAR_TRIP"]},
+              {"name": "CREW_MEMBER", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]},
+              {"name": "CREW_ROLE", "type": "attribute", "mappingType": "metadata", "sourceCols": ["PILOT", "COPILOT", "FLT_ENGINEER", "LOAD_MASTER"]}
+            ],
+            "sampleRows": [
+              ["10232", "Melton", "PILOT"],
+              ["10233", "Chen", "PILOT"],
+              ["10233", "Henderson", "COPILOT"],
+              ["10233", "O'Shaski", "FLT_ENGINEER"],
+              ["10233", "Benkasi", "LOAD_MASTER"],
+              ["10234", "Henderson", "PILOT"],
+              ["10234", "Melton", "COPILOT"],
+              ["10235", "Melton", "PILOT"]
+            ]
+          },
+          {
+            "name": "FLIGHT",
+            "columns": [
+              {"name": "CHAR_TRIP", "type": "PK", "mappingType": "direct", "sourceCols": ["CHAR_TRIP"]},
+              {"name": "CHAR_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_DATE"]},
+              {"name": "CHAR_CITY", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CITY"]},
+              {"name": "CHAR_MILES", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_MILES"]},
+              {"name": "CUST_NUM", "type": "FK", "mappingType": "direct", "sourceCols": ["CUST_NUM"]},
+              {"name": "CHAR_PAX", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_PAX"]},
+              {"name": "CHAR_CARGO", "type": "attribute", "mappingType": "direct", "sourceCols": ["CHAR_CARGO"]},
+              {"name": "AC_NUMBER", "type": "FK", "mappingType": "direct", "sourceCols": ["AC_NUMBER"]}
+            ],
+            "sampleRows": [
+              ["10232", "2018-01-15", "STL", "580", "784", "5", "235 lbs.", "1234Q"],
+              ["10233", "2018-01-15", "MIA", "1290", "231", "12", "18940 lbs.", "3456Y"],
+              ["10234", "2018-01-16", "TYS", "524", "544", "2", "348 lbs.", "1234Q"],
+              ["10235", "2018-01-17", "ATL", "768", "784", "5", "155 lbs.", "2256W"]
+            ]
+          },
+          {
+            "name": "CUSTOMER",
+            "columns": [
+              {"name": "CUST_NUM", "type": "PK", "mappingType": "direct", "sourceCols": ["CUST_NUM"]},
+              {"name": "CUST_LNAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["CUST_LNAME"]}
+            ],
+            "sampleRows": [
+              ["784", "Brown"],
+              ["231", "Hanson"],
+              ["544", "Bryana"]
+            ]
+          },
+          {
+            "name": "AIRCRAFT",
+            "columns": [
+              {"name": "AC_NUMBER", "type": "PK", "mappingType": "direct", "sourceCols": ["AC_NUMBER"]},
+              {"name": "MODEL_CODE", "type": "FK", "mappingType": "direct", "sourceCols": ["MODEL_CODE"]}
+            ],
+            "sampleRows": [
+              ["1234Q", "PA31-350"],
+              ["3456Y", "CV-580"],
+              ["2256W", "PA31-350"]
+            ]
+          },
+          {
+            "name": "AIRCRAFT_MODEL",
+            "columns": [
+              {"name": "MODEL_CODE", "type": "PK", "mappingType": "direct", "sourceCols": ["MODEL_CODE"]},
+              {"name": "MODEL_SEATS", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_SEATS"]},
+              {"name": "MODEL_CHG_MILE", "type": "attribute", "mappingType": "direct", "sourceCols": ["MODEL_CHG_MILE"]}
+            ],
+            "sampleRows": [
+              ["PA31-350", "10", "$2.79"],
+              ["CV-580", "38", "$23.36"]
+            ]
+          }
+        ],
+        "hints": [
+          "Look for transitive dependencies - when a non-key attribute depends on another non-key attribute rather than the primary key.",
+          "CUST_LNAME depends on CUST_NUM, not directly on CHAR_TRIP. MODEL_SEATS and MODEL_CHG_MILE depend on MODEL_CODE, which depends on AC_NUMBER.",
+          "Create separate tables: CUSTOMER (with CUST_NUM as PK), AIRCRAFT (linking AC_NUMBER to MODEL_CODE), and AIRCRAFT_MODEL (with MODEL_CODE as PK and the model specifications)."
+        ]
+      }
+    }
+  }
