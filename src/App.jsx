@@ -255,25 +255,25 @@ function App() {
         {selectedDataset && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-bold mb-4 text-gray-800">Normalization Progress</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-2">
               {NORMALIZATION_FORMS.map((form, idx) => {
                 const status = getFormStatus(form);
                 return (
                   <React.Fragment key={form}>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getFormStatusColor(status)}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shrink-0 ${getFormStatusColor(status)}`}>
                           {status === 'completed' ? '✓' : idx + 1}
                         </div>
-                        <span className="font-semibold text-gray-700">{form}</span>
+                        <span className="font-semibold text-gray-700 whitespace-nowrap">{form}</span>
                         {status === 'completed' && (
-                          <span className="text-xs text-green-600">✓ Completed</span>
+                          <span className="text-xs text-green-600 whitespace-nowrap">✓ Completed</span>
                         )}
                       </div>
                       {(status === 'current' || status === 'completed') && (
                         <button
                           onClick={() => handleFormChange(form)}
-                          className="text-xs text-blue-600 hover:text-blue-800"
+                          className="text-xs text-blue-600 hover:text-blue-800 break-words sm:break-normal"
                         >
                           {status === 'current' ? '(Click to work on this form)' : '(Click to view this form)'}
                         </button>
@@ -281,14 +281,14 @@ function App() {
                       {status === 'available' && (
                         <button
                           onClick={() => handleFormChange(form)}
-                          className="text-xs text-gray-600 hover:text-gray-800"
+                          className="text-xs text-gray-600 hover:text-gray-800 break-words sm:break-normal"
                         >
                           (Click to start this form)
                         </button>
                       )}
                     </div>
                     {idx < NORMALIZATION_FORMS.length - 1 && (
-                      <div className={`h-1 flex-1 ${status === 'completed' ? 'bg-green-500' : 'bg-gray-200'}`} />
+                      <div className={`w-full sm:w-auto sm:h-1 sm:flex-1 h-1 ${status === 'completed' ? 'bg-green-500' : 'bg-gray-200'} shrink-0`} />
                     )}
                   </React.Fragment>
                 );
@@ -309,14 +309,14 @@ function App() {
           <div className="space-y-6">
             {/* Current Form Header */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
                   <h2 className="text-2xl font-bold text-gray-800">
                     {selectedDataset.title} - {currentForm}
                   </h2>
                   <p className="text-gray-600 mt-1">{selectedDataset.description}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <button
                     onClick={() => {
                       const confirmReset = window.confirm(
@@ -326,7 +326,7 @@ function App() {
                         handleResetDataset(selectedDataset.id);
                       }
                     }}
-                    className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors whitespace-nowrap"
                     title="Reset this dataset"
                   >
                     Reset Dataset
@@ -336,7 +336,7 @@ function App() {
                       setSelectedDataset(null);
                       setValidationResult(null);
                     }}
-                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors whitespace-nowrap"
                   >
                     Change Dataset
                   </button>
