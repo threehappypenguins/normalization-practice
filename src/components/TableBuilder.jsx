@@ -30,6 +30,15 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
     setSavedTables(saved);
   }, [tables]); // Update when tables array changes
 
+  useEffect(() => {
+    // Regenerate previews for all saved tables when tables change
+    tables.forEach(table => {
+      if (table.saved && !previewData[table.id]) {
+        generatePreviewForTable(table.id);
+      }
+    });
+  }, [tables]);
+
   const addTable = () => {
     const newTable = {
       id: Date.now(),
@@ -180,29 +189,31 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
 
   const generatePreviewForTable = (tableId) => {
     if (!rawData) return;
-
+  
     const table = tables.find(t => t.id === tableId);
     if (!table || !table.columns || table.columns.length === 0) {
-      const newPreview = { ...previewData };
-      delete newPreview[tableId];
-      setPreviewData(newPreview);
+      setPreviewData(prev => {
+        const newPreview = { ...prev };
+        delete newPreview[tableId];
+        return newPreview;
+      });
       return;
     }
-
+  
     // Validate that all columns have required mapping info
     const hasValidMappings = table.columns.every(col => 
       col.mappingType && col.sourceCols && col.sourceCols.length > 0
     );
-
+  
     if (!hasValidMappings) {
       return; // Don't generate preview if mappings are incomplete
     }
-
+  
     const data = generateTableData(table, rawData);
-    setPreviewData({
-      ...previewData,
+    setPreviewData(prev => ({
+      ...prev,
       [tableId]: data
-    });
+    }));
   };
 
 
@@ -290,10 +301,10 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
 
         return (
           <div key={table.id} className="bg-white rounded-lg shadow-md p-6 border-2 border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div className="flex-1 min-w-0">
                 {isTableSaved(table.id) ? (
-                  <h4 className="text-lg font-semibold text-gray-800">{table.name || 'Untitled'}</h4>
+                  <h4 className="text-lg font-semibold text-gray-800 break-words">{table.name || 'Untitled'}</h4>
                 ) : (
                   <input
                     type="text"
@@ -304,25 +315,25 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                   />
                 )}
               </div>
-              <div className="flex gap-2 ml-4">
+              <div className="flex flex-wrap gap-2 shrink-0">
                 {isTableSaved(table.id) ? (
                   <button
                     onClick={() => handleEditTable(table.id)}
-                    className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
+                    className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm whitespace-nowrap"
                   >
                     Edit Table
                   </button>
                 ) : (
                   <button
                     onClick={() => handleSaveTable(table.id)}
-                    className="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+                    className="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm whitespace-nowrap"
                   >
                     Save Table
                   </button>
                 )}
                 <button
                   onClick={() => removeTable(table.id)}
-                  className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
+                  className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm whitespace-nowrap"
                 >
                   Remove Table
                 </button>
@@ -391,15 +402,15 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                       onDragEnd={handleDragEnd}
                     >
                     <div className="flex items-start gap-2 mb-2">
-                      <div className="cursor-move text-gray-400 hover:text-gray-600 mr-1">
+                      <div className="cursor-move text-gray-400 hover:text-gray-600 shrink-0">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                         </svg>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-gray-800">{column.name || 'Unnamed Column'}</span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="font-semibold text-gray-800 break-words">{column.name || 'Unnamed Column'}</span>
+                          <span className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
                             column.type === 'PK' ? 'bg-green-100 text-green-800' :
                             column.type === 'FK' ? 'bg-blue-100 text-blue-800' :
                             'bg-gray-100 text-gray-800'
@@ -407,7 +418,7 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                             {column.type}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-600 italic">
+                        <p className="text-xs text-gray-600 italic break-words">
                           {getMappingDescription(column)}
                         </p>
                         {column.mappingType && (
@@ -416,7 +427,7 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
                           </span>
                         )}
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 shrink-0">
                         <button
                           onClick={() => openColumnDialog(table.id, colIdx)}
                           className="px-2 py-1 bg-blue-400 text-white rounded-md hover:bg-blue-500 transition-colors text-sm"

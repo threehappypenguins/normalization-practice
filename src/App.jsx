@@ -83,13 +83,35 @@ function App() {
   }, [selectedDataset, currentForm, userTables]);
 
   const handleSelectDataset = (dataset) => {
+    // Save current tables before switching (if there's a current dataset)
+    if (selectedDataset) {
+      saveTablesForForm(selectedDataset.id, currentForm, userTables);
+    }
+    
     setSelectedDataset(dataset);
     // Load last viewed form for this dataset, or default to 1NF
     const lastView = JSON.parse(localStorage.getItem('lastView') || '{}');
     let formToLoad = '1NF';
+    
+    // Check if lastView is for this dataset
     if (lastView.datasetId === dataset.id && lastView.form && canAccessForm(lastView.form, dataset)) {
       formToLoad = lastView.form;
+    } else {
+      // If lastView is for a different dataset, check if this dataset has any saved work
+      // Try to find the most recently worked on form for this dataset
+      const allWork = JSON.parse(localStorage.getItem('normalizationWork') || '{}');
+      const datasetWork = allWork[dataset.id] || {};
+      
+      // Check forms in reverse order (3NF, 2NF, 1NF) to find the most advanced form with saved tables
+      for (let i = NORMALIZATION_FORMS.length - 1; i >= 0; i--) {
+        const form = NORMALIZATION_FORMS[i];
+        if (canAccessForm(form, dataset) && datasetWork[form] && datasetWork[form].length > 0) {
+          formToLoad = form;
+          break;
+        }
+      }
     }
+    
     setCurrentForm(formToLoad);
     const savedTables = loadTablesForForm(dataset.id, formToLoad);
     setUserTables(savedTables);
@@ -333,6 +355,10 @@ function App() {
                   </button>
                   <button
                     onClick={() => {
+                      // Save current tables before changing dataset
+                      if (selectedDataset) {
+                        saveTablesForForm(selectedDataset.id, currentForm, userTables);
+                      }
                       setSelectedDataset(null);
                       setValidationResult(null);
                     }}
