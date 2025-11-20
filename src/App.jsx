@@ -7,6 +7,7 @@ import RawDataView from './components/RawDataView';
 import TableBuilder from './components/TableBuilder';
 import HelpSystem from './components/HelpSystem';
 import ValidationFeedback from './components/ValidationFeedback';
+import PreviousFormTablesView from './components/PreviousFormTablesView';
 
 const NORMALIZATION_FORMS = ['1NF', '2NF', '3NF'];
 
@@ -142,6 +143,11 @@ function App() {
     setValidationResult(result);
 
     if (result.isValid) {
+      // Mark all tables as saved when answer is correct
+      const savedTables = userTables.map(table => ({ ...table, saved: true }));
+      setUserTables(savedTables);
+      // Save to localStorage
+      saveTablesForForm(selectedDataset.id, currentForm, savedTables);
       markFormCompleted(selectedDataset.id, currentForm);
       setProgress(getProgress());
     }
@@ -162,6 +168,27 @@ function App() {
     setUserTables(savedTables);
     setValidationResult(null);
   };
+
+  // Get previous form's tables for 2NF/3NF
+  const getPreviousFormTables = () => {
+    if (!selectedDataset) return null;
+    
+    if (currentForm === '2NF') {
+      const oneNFTables = loadTablesForForm(selectedDataset.id, '1NF');
+      // Only return tables that are saved (completed)
+      return oneNFTables.filter(table => table.saved && table.columns.length > 0);
+    } else if (currentForm === '3NF') {
+      const twoNFTables = loadTablesForForm(selectedDataset.id, '2NF');
+      // Only return tables that are saved (completed)
+      return twoNFTables.filter(table => table.saved && table.columns.length > 0);
+    }
+    
+    return null;
+  };
+
+  const previousFormTables = getPreviousFormTables();
+  const previousFormName = currentForm === '2NF' ? '1NF' : currentForm === '3NF' ? '2NF' : null;
+  const previousPreviousFormTables = currentForm === '3NF' && selectedDataset ? loadTablesForForm(selectedDataset.id, '1NF').filter(t => t.saved && t.columns.length > 0) : null;
 
   const handleResetProgress = () => {
     clearProgress();
@@ -370,12 +397,24 @@ function App() {
               </div>
             </div>
 
-            {/* Raw Data View */}
-            <RawDataView 
-              rawData={selectedDataset.rawData}
-              mappedColumns={getMappedColumns(userTables)}
-              mappingStats={selectedDataset.rawData ? getMappingStats(userTables, selectedDataset.rawData.columns) : null}
-            />
+            {/* Raw Data View - Only show for 1NF */}
+            {currentForm === '1NF' && (
+              <RawDataView 
+                rawData={selectedDataset.rawData}
+                mappedColumns={getMappedColumns(userTables)}
+                mappingStats={selectedDataset.rawData ? getMappingStats(userTables, selectedDataset.rawData.columns) : null}
+              />
+            )}
+
+            {/* Previous Form Tables View - Show for 2NF/3NF */}
+            {previousFormTables && previousFormTables.length > 0 && (
+              <PreviousFormTablesView
+                previousFormTables={previousFormTables}
+                previousFormName={previousFormName}
+                rawData={selectedDataset.rawData}
+                previousPreviousFormTables={previousPreviousFormTables}
+              />
+            )}
 
             {/* Help System */}
             <HelpSystem
@@ -403,6 +442,10 @@ function App() {
               tables={userTables}
               onTablesChange={setUserTables}
               rawData={selectedDataset.rawData}
+              previousFormTables={previousFormTables}
+              currentForm={currentForm}
+              previousFormName={previousFormName}
+              previousPreviousFormTables={previousPreviousFormTables}
             />
 
             {/* Validation Feedback */}

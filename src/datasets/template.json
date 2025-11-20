@@ -5,10 +5,22 @@
   "description": "Brief description of the normalization problem",
   "rawData": {
     "tableName": "RAW_DATA",
-    "columns": ["COLUMN1", "COLUMN2", "COLUMN3"],
+    "columns": [
+      "COLUMN1",
+      "COLUMN2",
+      "COLUMN3"
+    ],
     "rows": [
-      ["value1", "value2", "value3"],
-      ["value4", "value5", "value6"]
+      [
+        "value1",
+        "value2",
+        "value3"
+      ],
+      [
+        "value4",
+        "value5",
+        "value6"
+      ]
     ]
   },
   "solutions": {
@@ -18,12 +30,37 @@
         {
           "name": "TABLE_NAME",
           "columns": [
-            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
-            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
-            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+            {
+              "name": "COLUMN1",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "COLUMN1"
+              ]
+            },
+            {
+              "name": "COLUMN2",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "COLUMN2"
+              ]
+            },
+            {
+              "name": "COLUMN3",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "COLUMN3"
+              ]
+            }
           ],
           "sampleRows": [
-            ["value1", "value2", "value3"]
+            [
+              "value1",
+              "value2",
+              "value3"
+            ]
           ]
         }
       ],
@@ -39,12 +76,37 @@
         {
           "name": "TABLE_NAME",
           "columns": [
-            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
-            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
-            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+            {
+              "name": "COLUMN1",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN1"
+              ]
+            },
+            {
+              "name": "COLUMN2",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN2"
+              ]
+            },
+            {
+              "name": "COLUMN3",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN3"
+              ]
+            }
           ],
           "sampleRows": [
-            ["value1", "value2", "value3"]
+            [
+              "value1",
+              "value2",
+              "value3"
+            ]
           ]
         }
       ],
@@ -60,12 +122,37 @@
         {
           "name": "TABLE_NAME",
           "columns": [
-            {"name": "COLUMN1", "type": "PK", "mappingType": "direct", "sourceCols": ["COLUMN1"]},
-            {"name": "COLUMN2", "type": "FK", "mappingType": "direct", "sourceCols": ["COLUMN2"]},
-            {"name": "COLUMN3", "type": "attribute", "mappingType": "direct", "sourceCols": ["COLUMN3"]}
+            {
+              "name": "COLUMN1",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN1"
+              ]
+            },
+            {
+              "name": "COLUMN2",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN2"
+              ]
+            },
+            {
+              "name": "COLUMN3",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TABLE_NAME.COLUMN3"
+              ]
+            }
           ],
           "sampleRows": [
-            ["value1", "value2", "value3"]
+            [
+              "value1",
+              "value2",
+              "value3"
+            ]
           ]
         }
       ],

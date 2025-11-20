@@ -5,12 +5,62 @@
   "description": "Normalize a table containing student information with multiple courses enrolled in the same row.",
   "rawData": {
     "tableName": "RAW_DATA",
-    "columns": ["STUDENT_ID", "STUDENT_NAME", "ADVISOR_ID", "ADVISOR_NAME", "ADVISOR_OFFICE", "COURSE1", "COURSE1_CREDITS", "COURSE2", "COURSE2_CREDITS"],
+    "columns": [
+      "STUDENT_ID",
+      "STUDENT_NAME",
+      "ADVISOR_ID",
+      "ADVISOR_NAME",
+      "ADVISOR_OFFICE",
+      "COURSE1",
+      "COURSE1_CREDITS",
+      "COURSE2",
+      "COURSE2_CREDITS"
+    ],
     "rows": [
-      ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "CS101", "3", "MATH201", "4"],
-      ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4", "PHYS101", "3"],
-      ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105", "CS101", "3", "", ""],
-      ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "PHYS101", "3", "MATH201", "4"]
+      [
+        "S001",
+        "Emma Wilson",
+        "A100",
+        "Dr. Johnson",
+        "Building A-201",
+        "CS101",
+        "3",
+        "MATH201",
+        "4"
+      ],
+      [
+        "S002",
+        "James Brown",
+        "A100",
+        "Dr. Johnson",
+        "Building A-201",
+        "MATH201",
+        "4",
+        "PHYS101",
+        "3"
+      ],
+      [
+        "S003",
+        "Sarah Davis",
+        "A200",
+        "Dr. Smith",
+        "Building B-105",
+        "CS101",
+        "3",
+        "",
+        ""
+      ],
+      [
+        "S004",
+        "Michael Chen",
+        "A200",
+        "Dr. Smith",
+        "Building B-105",
+        "PHYS101",
+        "3",
+        "MATH201",
+        "4"
+      ]
     ]
   },
   "solutions": {
@@ -20,22 +70,129 @@
         {
           "name": "STUDENT_ENROLLMENT",
           "columns": [
-            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
-            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
-            { "name": "ADVISOR_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
-            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
-            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] },
-            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
-            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+            {
+              "name": "STUDENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ID"
+              ]
+            },
+            {
+              "name": "STUDENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ADVISOR_ID"
+              ]
+            },
+            {
+              "name": "ADVISOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ADVISOR_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_OFFICE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ADVISOR_OFFICE"
+              ]
+            },
+            {
+              "name": "COURSE",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "COURSE1",
+                "COURSE2"
+              ]
+            },
+            {
+              "name": "CREDITS",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "COURSE1_CREDITS",
+                "COURSE2_CREDITS"
+              ]
+            }
           ],
           "sampleRows": [
-            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "CS101", "3"],
-            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4"],
-            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "MATH201", "4"],
-            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201", "PHYS101", "3"],
-            ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105", "CS101", "3"],
-            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "PHYS101", "3"],
-            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105", "MATH201", "4"]
+            [
+              "S001",
+              "Emma Wilson",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201",
+              "CS101",
+              "3"
+            ],
+            [
+              "S001",
+              "Emma Wilson",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201",
+              "MATH201",
+              "4"
+            ],
+            [
+              "S002",
+              "James Brown",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201",
+              "MATH201",
+              "4"
+            ],
+            [
+              "S002",
+              "James Brown",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201",
+              "PHYS101",
+              "3"
+            ],
+            [
+              "S003",
+              "Sarah Davis",
+              "A200",
+              "Dr. Smith",
+              "Building B-105",
+              "CS101",
+              "3"
+            ],
+            [
+              "S004",
+              "Michael Chen",
+              "A200",
+              "Dr. Smith",
+              "Building B-105",
+              "PHYS101",
+              "3"
+            ],
+            [
+              "S004",
+              "Michael Chen",
+              "A200",
+              "Dr. Smith",
+              "Building B-105",
+              "MATH201",
+              "4"
+            ]
           ]
         }
       ],
@@ -51,45 +208,162 @@
         {
           "name": "STUDENT",
           "columns": [
-            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
-            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
-            { "name": "ADVISOR_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
-            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
-            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] }
+            {
+              "name": "STUDENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.STUDENT_ID"
+              ]
+            },
+            {
+              "name": "STUDENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.STUDENT_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.ADVISOR_ID"
+              ]
+            },
+            {
+              "name": "ADVISOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.ADVISOR_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_OFFICE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.ADVISOR_OFFICE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["S001", "Emma Wilson", "A100", "Dr. Johnson", "Building A-201"],
-            ["S002", "James Brown", "A100", "Dr. Johnson", "Building A-201"],
-            ["S003", "Sarah Davis", "A200", "Dr. Smith", "Building B-105"],
-            ["S004", "Michael Chen", "A200", "Dr. Smith", "Building B-105"]
+            [
+              "S001",
+              "Emma Wilson",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201"
+            ],
+            [
+              "S002",
+              "James Brown",
+              "A100",
+              "Dr. Johnson",
+              "Building A-201"
+            ],
+            [
+              "S003",
+              "Sarah Davis",
+              "A200",
+              "Dr. Smith",
+              "Building B-105"
+            ],
+            [
+              "S004",
+              "Michael Chen",
+              "A200",
+              "Dr. Smith",
+              "Building B-105"
+            ]
           ]
         },
         {
           "name": "COURSE",
           "columns": [
-            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
-            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+            {
+              "name": "COURSE",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.COURSE"
+              ]
+            },
+            {
+              "name": "CREDITS",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.CREDITS"
+              ]
+            }
           ],
           "sampleRows": [
-            ["CS101", "3"],
-            ["MATH201", "4"],
-            ["PHYS101", "3"]
+            [
+              "CS101",
+              "3"
+            ],
+            [
+              "MATH201",
+              "4"
+            ],
+            [
+              "PHYS101",
+              "3"
+            ]
           ]
         },
         {
           "name": "ENROLLMENT",
           "columns": [
-            { "name": "STUDENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
-            { "name": "COURSE", "type": "FK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] }
+            {
+              "name": "STUDENT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.STUDENT_ID"
+              ]
+            },
+            {
+              "name": "COURSE",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "STUDENT_ENROLLMENT.COURSE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["S001", "CS101"],
-            ["S001", "MATH201"],
-            ["S002", "MATH201"],
-            ["S002", "PHYS101"],
-            ["S003", "CS101"],
-            ["S004", "PHYS101"],
-            ["S004", "MATH201"]
+            [
+              "S001",
+              "CS101"
+            ],
+            [
+              "S001",
+              "MATH201"
+            ],
+            [
+              "S002",
+              "MATH201"
+            ],
+            [
+              "S002",
+              "PHYS101"
+            ],
+            [
+              "S003",
+              "CS101"
+            ],
+            [
+              "S004",
+              "PHYS101"
+            ],
+            [
+              "S004",
+              "MATH201"
+            ]
           ]
         }
       ],
@@ -105,55 +379,183 @@
         {
           "name": "ADVISOR",
           "columns": [
-            { "name": "ADVISOR_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] },
-            { "name": "ADVISOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_NAME"] },
-            { "name": "ADVISOR_OFFICE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ADVISOR_OFFICE"] }
+            {
+              "name": "ADVISOR_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.ADVISOR_ID"
+              ]
+            },
+            {
+              "name": "ADVISOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.ADVISOR_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_OFFICE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.ADVISOR_OFFICE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["A100", "Dr. Johnson", "Building A-201"],
-            ["A200", "Dr. Smith", "Building B-105"]
+            [
+              "A100",
+              "Dr. Johnson",
+              "Building A-201"
+            ],
+            [
+              "A200",
+              "Dr. Smith",
+              "Building B-105"
+            ]
           ]
         },
         {
           "name": "STUDENT",
           "columns": [
-            { "name": "STUDENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
-            { "name": "STUDENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["STUDENT_NAME"] },
-            { "name": "ADVISOR_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ADVISOR_ID"] }
+            {
+              "name": "STUDENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.STUDENT_ID",
+                "ENROLLMENT.STUDENT_ID"
+              ]
+            },
+            {
+              "name": "STUDENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.STUDENT_NAME"
+              ]
+            },
+            {
+              "name": "ADVISOR_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.ADVISOR_ID"
+              ]
+            }
           ],
           "sampleRows": [
-            ["S001", "Emma Wilson", "A100"],
-            ["S002", "James Brown", "A100"],
-            ["S003", "Sarah Davis", "A200"],
-            ["S004", "Michael Chen", "A200"]
+            [
+              "S001",
+              "Emma Wilson",
+              "A100"
+            ],
+            [
+              "S002",
+              "James Brown",
+              "A100"
+            ],
+            [
+              "S003",
+              "Sarah Davis",
+              "A200"
+            ],
+            [
+              "S004",
+              "Michael Chen",
+              "A200"
+            ]
           ]
         },
         {
           "name": "COURSE",
           "columns": [
-            { "name": "COURSE", "type": "PK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] },
-            { "name": "CREDITS", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["COURSE1_CREDITS", "COURSE2_CREDITS"] }
+            {
+              "name": "COURSE",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "COURSE.COURSE",
+                "ENROLLMENT.COURSE"
+              ]
+            },
+            {
+              "name": "CREDITS",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "COURSE.CREDITS"
+              ]
+            }
           ],
           "sampleRows": [
-            ["CS101", "3"],
-            ["MATH201", "4"],
-            ["PHYS101", "3"]
+            [
+              "CS101",
+              "3"
+            ],
+            [
+              "MATH201",
+              "4"
+            ],
+            [
+              "PHYS101",
+              "3"
+            ]
           ]
         },
         {
           "name": "ENROLLMENT",
           "columns": [
-            { "name": "STUDENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["STUDENT_ID"] },
-            { "name": "COURSE", "type": "FK", "mappingType": "consolidate", "sourceCols": ["COURSE1", "COURSE2"] }
+            {
+              "name": "STUDENT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "STUDENT.STUDENT_ID",
+                "ENROLLMENT.STUDENT_ID"
+              ]
+            },
+            {
+              "name": "COURSE",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "COURSE.COURSE",
+                "ENROLLMENT.COURSE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["S001", "CS101"],
-            ["S001", "MATH201"],
-            ["S002", "MATH201"],
-            ["S002", "PHYS101"],
-            ["S003", "CS101"],
-            ["S004", "PHYS101"],
-            ["S004", "MATH201"]
+            [
+              "S001",
+              "CS101"
+            ],
+            [
+              "S001",
+              "MATH201"
+            ],
+            [
+              "S002",
+              "MATH201"
+            ],
+            [
+              "S002",
+              "PHYS101"
+            ],
+            [
+              "S003",
+              "CS101"
+            ],
+            [
+              "S004",
+              "PHYS101"
+            ],
+            [
+              "S004",
+              "MATH201"
+            ]
           ]
         }
       ],

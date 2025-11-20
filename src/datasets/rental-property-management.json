@@ -5,12 +5,92 @@
   "description": "Normalize a rental property system with tenant information, multiple lease agreements, property details, landlord information, and maintenance records.",
   "rawData": {
     "tableName": "RAW_DATA",
-    "columns": ["TENANT_ID", "TENANT_NAME", "TENANT_PHONE", "PROPERTY_ID", "PROPERTY_ADDRESS", "PROPERTY_TYPE", "LANDLORD_ID", "LANDLORD_NAME", "LANDLORD_EMAIL", "LEASE1_START", "LEASE1_END", "LEASE1_RENT", "LEASE2_START", "LEASE2_END", "LEASE2_RENT"],
+    "columns": [
+      "TENANT_ID",
+      "TENANT_NAME",
+      "TENANT_PHONE",
+      "PROPERTY_ID",
+      "PROPERTY_ADDRESS",
+      "PROPERTY_TYPE",
+      "LANDLORD_ID",
+      "LANDLORD_NAME",
+      "LANDLORD_EMAIL",
+      "LEASE1_START",
+      "LEASE1_END",
+      "LEASE1_RENT",
+      "LEASE2_START",
+      "LEASE2_END",
+      "LEASE2_RENT"
+    ],
     "rows": [
-      ["T001", "Alice Brown", "555-1001", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2023-01-01", "2023-12-31", "1200", "2024-01-01", "2024-12-31", "1250"],
-      ["T002", "Bob Wilson", "555-1002", "PR002", "456 Oak Ave", "House", "LL001", "John Property", "john@realty.com", "2023-06-01", "2024-05-31", "2000", "", "", ""],
-      ["T003", "Carol Davis", "555-1003", "PR003", "789 Pine Rd", "Apartment", "LL002", "Susan Realty", "susan@homes.com", "2023-03-01", "2024-02-29", "1100", "2024-03-01", "2025-02-28", "1150"],
-      ["T004", "David Lee", "555-1004", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2022-07-01", "2023-06-30", "1150", "2023-07-01", "2024-06-30", "1200"]
+      [
+        "T001",
+        "Alice Brown",
+        "555-1001",
+        "PR001",
+        "123 Main St",
+        "Apartment",
+        "LL001",
+        "John Property",
+        "john@realty.com",
+        "2023-01-01",
+        "2023-12-31",
+        "1200",
+        "2024-01-01",
+        "2024-12-31",
+        "1250"
+      ],
+      [
+        "T002",
+        "Bob Wilson",
+        "555-1002",
+        "PR002",
+        "456 Oak Ave",
+        "House",
+        "LL001",
+        "John Property",
+        "john@realty.com",
+        "2023-06-01",
+        "2024-05-31",
+        "2000",
+        "",
+        "",
+        ""
+      ],
+      [
+        "T003",
+        "Carol Davis",
+        "555-1003",
+        "PR003",
+        "789 Pine Rd",
+        "Apartment",
+        "LL002",
+        "Susan Realty",
+        "susan@homes.com",
+        "2023-03-01",
+        "2024-02-29",
+        "1100",
+        "2024-03-01",
+        "2025-02-28",
+        "1150"
+      ],
+      [
+        "T004",
+        "David Lee",
+        "555-1004",
+        "PR001",
+        "123 Main St",
+        "Apartment",
+        "LL001",
+        "John Property",
+        "john@realty.com",
+        "2022-07-01",
+        "2023-06-30",
+        "1150",
+        "2023-07-01",
+        "2024-06-30",
+        "1200"
+      ]
     ]
   },
   "solutions": {
@@ -20,27 +100,205 @@
         {
           "name": "TENANT_LEASE",
           "columns": [
-            { "name": "TENANT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["TENANT_ID"] },
-            { "name": "TENANT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_NAME"] },
-            { "name": "TENANT_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_PHONE"] },
-            { "name": "PROPERTY_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_ID"] },
-            { "name": "PROPERTY_ADDRESS", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_ADDRESS"] },
-            { "name": "PROPERTY_TYPE", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_TYPE"] },
-            { "name": "LANDLORD_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_ID"] },
-            { "name": "LANDLORD_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_NAME"] },
-            { "name": "LANDLORD_EMAIL", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_EMAIL"] },
-            { "name": "LEASE_START", "type": "PK", "mappingType": "consolidate", "sourceCols": ["LEASE1_START", "LEASE2_START"] },
-            { "name": "LEASE_END", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_END", "LEASE2_END"] },
-            { "name": "RENT", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_RENT", "LEASE2_RENT"] }
+            {
+              "name": "TENANT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_ID"
+              ]
+            },
+            {
+              "name": "TENANT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_NAME"
+              ]
+            },
+            {
+              "name": "TENANT_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_PHONE"
+              ]
+            },
+            {
+              "name": "PROPERTY_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY_ID"
+              ]
+            },
+            {
+              "name": "PROPERTY_ADDRESS",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY_ADDRESS"
+              ]
+            },
+            {
+              "name": "PROPERTY_TYPE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY_TYPE"
+              ]
+            },
+            {
+              "name": "LANDLORD_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "LANDLORD_ID"
+              ]
+            },
+            {
+              "name": "LANDLORD_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "LANDLORD_NAME"
+              ]
+            },
+            {
+              "name": "LANDLORD_EMAIL",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "LANDLORD_EMAIL"
+              ]
+            },
+            {
+              "name": "LEASE_START",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE1_START",
+                "LEASE2_START"
+              ]
+            },
+            {
+              "name": "LEASE_END",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE1_END",
+                "LEASE2_END"
+              ]
+            },
+            {
+              "name": "RENT",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE1_RENT",
+                "LEASE2_RENT"
+              ]
+            }
           ],
           "sampleRows": [
-            ["T001", "Alice Brown", "555-1001", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2023-01-01", "2023-12-31", "1200"],
-            ["T001", "Alice Brown", "555-1001", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2024-01-01", "2024-12-31", "1250"],
-            ["T002", "Bob Wilson", "555-1002", "PR002", "456 Oak Ave", "House", "LL001", "John Property", "john@realty.com", "2023-06-01", "2024-05-31", "2000"],
-            ["T003", "Carol Davis", "555-1003", "PR003", "789 Pine Rd", "Apartment", "LL002", "Susan Realty", "susan@homes.com", "2023-03-01", "2024-02-29", "1100"],
-            ["T003", "Carol Davis", "555-1003", "PR003", "789 Pine Rd", "Apartment", "LL002", "Susan Realty", "susan@homes.com", "2024-03-01", "2025-02-28", "1150"],
-            ["T004", "David Lee", "555-1004", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2022-07-01", "2023-06-30", "1150"],
-            ["T004", "David Lee", "555-1004", "PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com", "2023-07-01", "2024-06-30", "1200"]
+            [
+              "T001",
+              "Alice Brown",
+              "555-1001",
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001",
+              "John Property",
+              "john@realty.com",
+              "2023-01-01",
+              "2023-12-31",
+              "1200"
+            ],
+            [
+              "T001",
+              "Alice Brown",
+              "555-1001",
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001",
+              "John Property",
+              "john@realty.com",
+              "2024-01-01",
+              "2024-12-31",
+              "1250"
+            ],
+            [
+              "T002",
+              "Bob Wilson",
+              "555-1002",
+              "PR002",
+              "456 Oak Ave",
+              "House",
+              "LL001",
+              "John Property",
+              "john@realty.com",
+              "2023-06-01",
+              "2024-05-31",
+              "2000"
+            ],
+            [
+              "T003",
+              "Carol Davis",
+              "555-1003",
+              "PR003",
+              "789 Pine Rd",
+              "Apartment",
+              "LL002",
+              "Susan Realty",
+              "susan@homes.com",
+              "2023-03-01",
+              "2024-02-29",
+              "1100"
+            ],
+            [
+              "T003",
+              "Carol Davis",
+              "555-1003",
+              "PR003",
+              "789 Pine Rd",
+              "Apartment",
+              "LL002",
+              "Susan Realty",
+              "susan@homes.com",
+              "2024-03-01",
+              "2025-02-28",
+              "1150"
+            ],
+            [
+              "T004",
+              "David Lee",
+              "555-1004",
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001",
+              "John Property",
+              "john@realty.com",
+              "2022-07-01",
+              "2023-06-30",
+              "1150"
+            ],
+            [
+              "T004",
+              "David Lee",
+              "555-1004",
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001",
+              "John Property",
+              "john@realty.com",
+              "2023-07-01",
+              "2024-06-30",
+              "1200"
+            ]
           ]
         }
       ],
@@ -56,50 +314,227 @@
         {
           "name": "TENANT",
           "columns": [
-            { "name": "TENANT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["TENANT_ID"] },
-            { "name": "TENANT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_NAME"] },
-            { "name": "TENANT_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_PHONE"] }
+            {
+              "name": "TENANT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.TENANT_ID"
+              ]
+            },
+            {
+              "name": "TENANT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.TENANT_NAME"
+              ]
+            },
+            {
+              "name": "TENANT_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.TENANT_PHONE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["T001", "Alice Brown", "555-1001"],
-            ["T002", "Bob Wilson", "555-1002"],
-            ["T003", "Carol Davis", "555-1003"],
-            ["T004", "David Lee", "555-1004"]
+            [
+              "T001",
+              "Alice Brown",
+              "555-1001"
+            ],
+            [
+              "T002",
+              "Bob Wilson",
+              "555-1002"
+            ],
+            [
+              "T003",
+              "Carol Davis",
+              "555-1003"
+            ],
+            [
+              "T004",
+              "David Lee",
+              "555-1004"
+            ]
           ]
         },
         {
           "name": "PROPERTY",
           "columns": [
-            { "name": "PROPERTY_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PROPERTY_ID"] },
-            { "name": "PROPERTY_ADDRESS", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_ADDRESS"] },
-            { "name": "PROPERTY_TYPE", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_TYPE"] },
-            { "name": "LANDLORD_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["LANDLORD_ID"] },
-            { "name": "LANDLORD_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_NAME"] },
-            { "name": "LANDLORD_EMAIL", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_EMAIL"] }
+            {
+              "name": "PROPERTY_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.PROPERTY_ID"
+              ]
+            },
+            {
+              "name": "PROPERTY_ADDRESS",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.PROPERTY_ADDRESS"
+              ]
+            },
+            {
+              "name": "PROPERTY_TYPE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.PROPERTY_TYPE"
+              ]
+            },
+            {
+              "name": "LANDLORD_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.LANDLORD_ID"
+              ]
+            },
+            {
+              "name": "LANDLORD_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.LANDLORD_NAME"
+              ]
+            },
+            {
+              "name": "LANDLORD_EMAIL",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.LANDLORD_EMAIL"
+              ]
+            }
           ],
           "sampleRows": [
-            ["PR001", "123 Main St", "Apartment", "LL001", "John Property", "john@realty.com"],
-            ["PR002", "456 Oak Ave", "House", "LL001", "John Property", "john@realty.com"],
-            ["PR003", "789 Pine Rd", "Apartment", "LL002", "Susan Realty", "susan@homes.com"]
+            [
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001",
+              "John Property",
+              "john@realty.com"
+            ],
+            [
+              "PR002",
+              "456 Oak Ave",
+              "House",
+              "LL001",
+              "John Property",
+              "john@realty.com"
+            ],
+            [
+              "PR003",
+              "789 Pine Rd",
+              "Apartment",
+              "LL002",
+              "Susan Realty",
+              "susan@homes.com"
+            ]
           ]
         },
         {
           "name": "LEASE",
           "columns": [
-            { "name": "TENANT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["TENANT_ID"] },
-            { "name": "PROPERTY_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PROPERTY_ID"] },
-            { "name": "LEASE_START", "type": "PK", "mappingType": "consolidate", "sourceCols": ["LEASE1_START", "LEASE2_START"] },
-            { "name": "LEASE_END", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_END", "LEASE2_END"] },
-            { "name": "RENT", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_RENT", "LEASE2_RENT"] }
+            {
+              "name": "TENANT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.TENANT_ID"
+              ]
+            },
+            {
+              "name": "PROPERTY_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT_LEASE.PROPERTY_ID"
+              ]
+            },
+            {
+              "name": "LEASE_START",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TENANT_LEASE.LEASE_START"
+              ]
+            },
+            {
+              "name": "LEASE_END",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TENANT_LEASE.LEASE_END"
+              ]
+            },
+            {
+              "name": "RENT",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TENANT_LEASE.RENT"
+              ]
+            }
           ],
           "sampleRows": [
-            ["T001", "PR001", "2023-01-01", "2023-12-31", "1200"],
-            ["T001", "PR001", "2024-01-01", "2024-12-31", "1250"],
-            ["T002", "PR002", "2023-06-01", "2024-05-31", "2000"],
-            ["T003", "PR003", "2023-03-01", "2024-02-29", "1100"],
-            ["T003", "PR003", "2024-03-01", "2025-02-28", "1150"],
-            ["T004", "PR001", "2022-07-01", "2023-06-30", "1150"],
-            ["T004", "PR001", "2023-07-01", "2024-06-30", "1200"]
+            [
+              "T001",
+              "PR001",
+              "2023-01-01",
+              "2023-12-31",
+              "1200"
+            ],
+            [
+              "T001",
+              "PR001",
+              "2024-01-01",
+              "2024-12-31",
+              "1250"
+            ],
+            [
+              "T002",
+              "PR002",
+              "2023-06-01",
+              "2024-05-31",
+              "2000"
+            ],
+            [
+              "T003",
+              "PR003",
+              "2023-03-01",
+              "2024-02-29",
+              "1100"
+            ],
+            [
+              "T003",
+              "PR003",
+              "2024-03-01",
+              "2025-02-28",
+              "1150"
+            ],
+            [
+              "T004",
+              "PR001",
+              "2022-07-01",
+              "2023-06-30",
+              "1150"
+            ],
+            [
+              "T004",
+              "PR001",
+              "2023-07-01",
+              "2024-06-30",
+              "1200"
+            ]
           ]
         }
       ],
@@ -116,60 +551,250 @@
         {
           "name": "LANDLORD",
           "columns": [
-            { "name": "LANDLORD_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["LANDLORD_ID"] },
-            { "name": "LANDLORD_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_NAME"] },
-            { "name": "LANDLORD_EMAIL", "type": "attribute", "mappingType": "direct", "sourceCols": ["LANDLORD_EMAIL"] }
+            {
+              "name": "LANDLORD_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.LANDLORD_ID"
+              ]
+            },
+            {
+              "name": "LANDLORD_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.LANDLORD_NAME"
+              ]
+            },
+            {
+              "name": "LANDLORD_EMAIL",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.LANDLORD_EMAIL"
+              ]
+            }
           ],
           "sampleRows": [
-            ["LL001", "John Property", "john@realty.com"],
-            ["LL002", "Susan Realty", "susan@homes.com"]
+            [
+              "LL001",
+              "John Property",
+              "john@realty.com"
+            ],
+            [
+              "LL002",
+              "Susan Realty",
+              "susan@homes.com"
+            ]
           ]
         },
         {
           "name": "PROPERTY",
           "columns": [
-            { "name": "PROPERTY_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PROPERTY_ID"] },
-            { "name": "PROPERTY_ADDRESS", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_ADDRESS"] },
-            { "name": "PROPERTY_TYPE", "type": "attribute", "mappingType": "direct", "sourceCols": ["PROPERTY_TYPE"] },
-            { "name": "LANDLORD_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["LANDLORD_ID"] }
+            {
+              "name": "PROPERTY_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.PROPERTY_ID",
+                "LEASE.PROPERTY_ID"
+              ]
+            },
+            {
+              "name": "PROPERTY_ADDRESS",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.PROPERTY_ADDRESS"
+              ]
+            },
+            {
+              "name": "PROPERTY_TYPE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.PROPERTY_TYPE"
+              ]
+            },
+            {
+              "name": "LANDLORD_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.LANDLORD_ID"
+              ]
+            }
           ],
           "sampleRows": [
-            ["PR001", "123 Main St", "Apartment", "LL001"],
-            ["PR002", "456 Oak Ave", "House", "LL001"],
-            ["PR003", "789 Pine Rd", "Apartment", "LL002"]
+            [
+              "PR001",
+              "123 Main St",
+              "Apartment",
+              "LL001"
+            ],
+            [
+              "PR002",
+              "456 Oak Ave",
+              "House",
+              "LL001"
+            ],
+            [
+              "PR003",
+              "789 Pine Rd",
+              "Apartment",
+              "LL002"
+            ]
           ]
         },
         {
           "name": "TENANT",
           "columns": [
-            { "name": "TENANT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["TENANT_ID"] },
-            { "name": "TENANT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_NAME"] },
-            { "name": "TENANT_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["TENANT_PHONE"] }
+            {
+              "name": "TENANT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT.TENANT_ID",
+                "LEASE.TENANT_ID"
+              ]
+            },
+            {
+              "name": "TENANT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT.TENANT_NAME"
+              ]
+            },
+            {
+              "name": "TENANT_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT.TENANT_PHONE"
+              ]
+            }
           ],
           "sampleRows": [
-            ["T001", "Alice Brown", "555-1001"],
-            ["T002", "Bob Wilson", "555-1002"],
-            ["T003", "Carol Davis", "555-1003"],
-            ["T004", "David Lee", "555-1004"]
+            [
+              "T001",
+              "Alice Brown",
+              "555-1001"
+            ],
+            [
+              "T002",
+              "Bob Wilson",
+              "555-1002"
+            ],
+            [
+              "T003",
+              "Carol Davis",
+              "555-1003"
+            ],
+            [
+              "T004",
+              "David Lee",
+              "555-1004"
+            ]
           ]
         },
         {
           "name": "LEASE",
           "columns": [
-            { "name": "TENANT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["TENANT_ID"] },
-            { "name": "PROPERTY_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PROPERTY_ID"] },
-            { "name": "LEASE_START", "type": "PK", "mappingType": "consolidate", "sourceCols": ["LEASE1_START", "LEASE2_START"] },
-            { "name": "LEASE_END", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_END", "LEASE2_END"] },
-            { "name": "RENT", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["LEASE1_RENT", "LEASE2_RENT"] }
+            {
+              "name": "TENANT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "TENANT.TENANT_ID",
+                "LEASE.TENANT_ID"
+              ]
+            },
+            {
+              "name": "PROPERTY_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PROPERTY.PROPERTY_ID",
+                "LEASE.PROPERTY_ID"
+              ]
+            },
+            {
+              "name": "LEASE_START",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE.LEASE_START"
+              ]
+            },
+            {
+              "name": "LEASE_END",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE.LEASE_END"
+              ]
+            },
+            {
+              "name": "RENT",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "LEASE.RENT"
+              ]
+            }
           ],
           "sampleRows": [
-            ["T001", "PR001", "2023-01-01", "2023-12-31", "1200"],
-            ["T001", "PR001", "2024-01-01", "2024-12-31", "1250"],
-            ["T002", "PR002", "2023-06-01", "2024-05-31", "2000"],
-            ["T003", "PR003", "2023-03-01", "2024-02-29", "1100"],
-            ["T003", "PR003", "2024-03-01", "2025-02-28", "1150"],
-            ["T004", "PR001", "2022-07-01", "2023-06-30", "1150"],
-            ["T004", "PR001", "2023-07-01", "2024-06-30", "1200"]
+            [
+              "T001",
+              "PR001",
+              "2023-01-01",
+              "2023-12-31",
+              "1200"
+            ],
+            [
+              "T001",
+              "PR001",
+              "2024-01-01",
+              "2024-12-31",
+              "1250"
+            ],
+            [
+              "T002",
+              "PR002",
+              "2023-06-01",
+              "2024-05-31",
+              "2000"
+            ],
+            [
+              "T003",
+              "PR003",
+              "2023-03-01",
+              "2024-02-29",
+              "1100"
+            ],
+            [
+              "T003",
+              "PR003",
+              "2024-03-01",
+              "2025-02-28",
+              "1150"
+            ],
+            [
+              "T004",
+              "PR001",
+              "2022-07-01",
+              "2023-06-30",
+              "1150"
+            ],
+            [
+              "T004",
+              "PR001",
+              "2023-07-01",
+              "2024-06-30",
+              "1200"
+            ]
           ]
         }
       ],

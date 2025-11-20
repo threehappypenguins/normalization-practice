@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ColumnMappingDialog from './ColumnMappingDialog';
-import { generateTableData, getMappedColumns } from '../utils/dataTransformer';
+import { generateTableData, getMappedColumns, getAvailableSourceColumns } from '../utils/dataTransformer';
 
-export default function TableBuilder({ tables, onTablesChange, rawData }) {
+export default function TableBuilder({ tables, onTablesChange, rawData, previousFormTables = null, currentForm = '1NF', previousFormName = null, previousPreviousFormTables = null }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTableId, setCurrentTableId] = useState(null);
   const [editingColumnIndex, setEditingColumnIndex] = useState(null); // Track which column is being edited
@@ -188,7 +188,9 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
   }, [draggedColumn]);
 
   const generatePreviewForTable = (tableId) => {
-    if (!rawData) return;
+    // For 2NF/3NF, we need rawData to generate previews of previous form tables
+    // But the source data for new tables comes from previousFormTables
+    if (!rawData && !previousFormTables) return;
   
     const table = tables.find(t => t.id === tableId);
     if (!table || !table.columns || table.columns.length === 0) {
@@ -209,7 +211,9 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
       return; // Don't generate preview if mappings are incomplete
     }
   
-    const data = generateTableData(table, rawData);
+    // Use previousFormTables if available (for 2NF/3NF), otherwise use rawData (for 1NF)
+    // For 3NF, also pass previousPreviousFormTables (1NF) to generate 2NF from 1NF
+    const data = generateTableData(table, rawData, previousFormTables, previousPreviousFormTables);
     setPreviewData(prev => ({
       ...prev,
       [tableId]: data
@@ -280,7 +284,18 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-gray-800">Your Tables</h3>
+        <div>
+          <h3 className="text-xl font-bold text-gray-800">
+            {previousFormTables && previousFormTables.length > 0 
+              ? `Build Your ${currentForm} Tables Below` 
+              : 'Your Tables'}
+          </h3>
+          {previousFormTables && previousFormTables.length > 0 && previousFormName && (
+            <p className="text-sm text-gray-600 mt-1">
+              Create new tables based on your {previousFormName} tables shown above.
+            </p>
+          )}
+        </div>
         <button
           onClick={addTable}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
@@ -541,7 +556,7 @@ export default function TableBuilder({ tables, onTablesChange, rawData }) {
           setEditingColumnIndex(null);
         }}
         onAddColumn={handleAddColumn}
-        availableSourceColumns={rawData?.columns || []}
+        availableSourceColumns={getAvailableSourceColumns(rawData, previousFormTables)}
         mappedColumns={currentTableId ? getMappedColsForTable(currentTableId) : []}
         existingColumn={editingColumnIndex !== null && currentTableId 
           ? tables.find(t => t.id === currentTableId)?.columns[editingColumnIndex] 

@@ -1,318 +1,1333 @@
 {
-    "id": "hospital-patient-treatment",
-    "title": "Hospital Patient Treatment Records",
-    "difficulty": "hard",
-    "description": "Normalize a complex hospital system with patients, multiple treatments per visit, doctors with specializations, room assignments, and medication prescriptions.",
-    "rawData": {
-      "tableName": "RAW_DATA",
-      "columns": ["PATIENT_ID", "PATIENT_NAME", "PATIENT_DOB", "INSURANCE_COMPANY", "INSURANCE_PHONE", "VISIT_ID", "VISIT_DATE", "ROOM_ID", "ROOM_TYPE", "DAILY_RATE", "DOCTOR_ID", "DOCTOR_NAME", "SPECIALIZATION", "DEPT_ID", "DEPT_NAME", "TREATMENT1", "TREATMENT1_COST", "MEDICATION1", "MEDICATION1_DOSAGE", "TREATMENT2", "TREATMENT2_COST", "MEDICATION2", "MEDICATION2_DOSAGE"],
-      "rows": [
-        ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100", "V001", "2024-01-10", "R101", "Private", "500", "D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care", "ECG", "200", "Aspirin", "100mg", "Blood Test", "150", "Lisinopril", "10mg"],
-        ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100", "V002", "2024-02-20", "R102", "Private", "500", "D002", "Dr. Williams", "Cardiology", "DEPT01", "Cardiac Care", "Stress Test", "300", "Metoprolol", "50mg", "", "", "", ""],
-        ["P002", "Bob Martinez", "1990-07-22", "CarePlus", "555-0200", "V003", "2024-01-15", "R201", "Shared", "300", "D003", "Dr. Lee", "Orthopedics", "DEPT02", "Bone & Joint", "X-Ray", "180", "Ibuprofen", "400mg", "Cast Application", "250", "", ""],
-        ["P003", "Carol White", "1978-11-30", "HealthFirst", "555-0100", "V004", "2024-01-18", "R101", "Private", "500", "D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care", "ECG", "200", "Aspirin", "100mg", "", "", "", ""]
+  "id": "hospital-patient-treatment",
+  "title": "Hospital Patient Treatment Records",
+  "difficulty": "hard",
+  "description": "Normalize a complex hospital system with patients, multiple treatments per visit, doctors with specializations, room assignments, and medication prescriptions.",
+  "rawData": {
+    "tableName": "RAW_DATA",
+    "columns": [
+      "PATIENT_ID",
+      "PATIENT_NAME",
+      "PATIENT_DOB",
+      "INSURANCE_COMPANY",
+      "INSURANCE_PHONE",
+      "VISIT_ID",
+      "VISIT_DATE",
+      "ROOM_ID",
+      "ROOM_TYPE",
+      "DAILY_RATE",
+      "DOCTOR_ID",
+      "DOCTOR_NAME",
+      "SPECIALIZATION",
+      "DEPT_ID",
+      "DEPT_NAME",
+      "TREATMENT1",
+      "TREATMENT1_COST",
+      "MEDICATION1",
+      "MEDICATION1_DOSAGE",
+      "TREATMENT2",
+      "TREATMENT2_COST",
+      "MEDICATION2",
+      "MEDICATION2_DOSAGE"
+    ],
+    "rows": [
+      [
+        "P001",
+        "Alice Johnson",
+        "1985-03-15",
+        "HealthFirst",
+        "555-0100",
+        "V001",
+        "2024-01-10",
+        "R101",
+        "Private",
+        "500",
+        "D001",
+        "Dr. Smith",
+        "Cardiology",
+        "DEPT01",
+        "Cardiac Care",
+        "ECG",
+        "200",
+        "Aspirin",
+        "100mg",
+        "Blood Test",
+        "150",
+        "Lisinopril",
+        "10mg"
+      ],
+      [
+        "P001",
+        "Alice Johnson",
+        "1985-03-15",
+        "HealthFirst",
+        "555-0100",
+        "V002",
+        "2024-02-20",
+        "R102",
+        "Private",
+        "500",
+        "D002",
+        "Dr. Williams",
+        "Cardiology",
+        "DEPT01",
+        "Cardiac Care",
+        "Stress Test",
+        "300",
+        "Metoprolol",
+        "50mg",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "P002",
+        "Bob Martinez",
+        "1990-07-22",
+        "CarePlus",
+        "555-0200",
+        "V003",
+        "2024-01-15",
+        "R201",
+        "Shared",
+        "300",
+        "D003",
+        "Dr. Lee",
+        "Orthopedics",
+        "DEPT02",
+        "Bone & Joint",
+        "X-Ray",
+        "180",
+        "Ibuprofen",
+        "400mg",
+        "Cast Application",
+        "250",
+        "",
+        ""
+      ],
+      [
+        "P003",
+        "Carol White",
+        "1978-11-30",
+        "HealthFirst",
+        "555-0100",
+        "V004",
+        "2024-01-18",
+        "R101",
+        "Private",
+        "500",
+        "D001",
+        "Dr. Smith",
+        "Cardiology",
+        "DEPT01",
+        "Cardiac Care",
+        "ECG",
+        "200",
+        "Aspirin",
+        "100mg",
+        "",
+        "",
+        "",
+        ""
+      ]
+    ]
+  },
+  "solutions": {
+    "1NF": {
+      "explanation": "Eliminate repeating treatment and medication groups by creating separate rows for each treatment-medication pair within a visit.",
+      "tables": [
+        {
+          "name": "PATIENT_VISIT_TREATMENT",
+          "columns": [
+            {
+              "name": "PATIENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_ID"
+              ]
+            },
+            {
+              "name": "PATIENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_NAME"
+              ]
+            },
+            {
+              "name": "PATIENT_DOB",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_DOB"
+              ]
+            },
+            {
+              "name": "INSURANCE_COMPANY",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "INSURANCE_COMPANY"
+              ]
+            },
+            {
+              "name": "INSURANCE_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "INSURANCE_PHONE"
+              ]
+            },
+            {
+              "name": "VISIT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "VISIT_ID"
+              ]
+            },
+            {
+              "name": "VISIT_DATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "VISIT_DATE"
+              ]
+            },
+            {
+              "name": "ROOM_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM_ID"
+              ]
+            },
+            {
+              "name": "ROOM_TYPE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM_TYPE"
+              ]
+            },
+            {
+              "name": "DAILY_RATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DAILY_RATE"
+              ]
+            },
+            {
+              "name": "DOCTOR_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR_ID"
+              ]
+            },
+            {
+              "name": "DOCTOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR_NAME"
+              ]
+            },
+            {
+              "name": "SPECIALIZATION",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "SPECIALIZATION"
+              ]
+            },
+            {
+              "name": "DEPT_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DEPT_ID"
+              ]
+            },
+            {
+              "name": "DEPT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DEPT_NAME"
+              ]
+            },
+            {
+              "name": "TREATMENT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TREATMENT1",
+                "TREATMENT2"
+              ]
+            },
+            {
+              "name": "TREATMENT_COST",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TREATMENT1_COST",
+                "TREATMENT2_COST"
+              ]
+            },
+            {
+              "name": "MEDICATION",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "MEDICATION1",
+                "MEDICATION2"
+              ]
+            },
+            {
+              "name": "MEDICATION_DOSAGE",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "MEDICATION1_DOSAGE",
+                "MEDICATION2_DOSAGE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "P001",
+              "Alice Johnson",
+              "1985-03-15",
+              "HealthFirst",
+              "555-0100",
+              "V001",
+              "2024-01-10",
+              "R101",
+              "Private",
+              "500",
+              "D001",
+              "Dr. Smith",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care",
+              "ECG",
+              "200",
+              "Aspirin",
+              "100mg"
+            ],
+            [
+              "P001",
+              "Alice Johnson",
+              "1985-03-15",
+              "HealthFirst",
+              "555-0100",
+              "V001",
+              "2024-01-10",
+              "R101",
+              "Private",
+              "500",
+              "D001",
+              "Dr. Smith",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care",
+              "Blood Test",
+              "150",
+              "Lisinopril",
+              "10mg"
+            ],
+            [
+              "P001",
+              "Alice Johnson",
+              "1985-03-15",
+              "HealthFirst",
+              "555-0100",
+              "V002",
+              "2024-02-20",
+              "R102",
+              "Private",
+              "500",
+              "D002",
+              "Dr. Williams",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care",
+              "Stress Test",
+              "300",
+              "Metoprolol",
+              "50mg"
+            ],
+            [
+              "P002",
+              "Bob Martinez",
+              "1990-07-22",
+              "CarePlus",
+              "555-0200",
+              "V003",
+              "2024-01-15",
+              "R201",
+              "Shared",
+              "300",
+              "D003",
+              "Dr. Lee",
+              "Orthopedics",
+              "DEPT02",
+              "Bone & Joint",
+              "X-Ray",
+              "180",
+              "Ibuprofen",
+              "400mg"
+            ],
+            [
+              "P002",
+              "Bob Martinez",
+              "1990-07-22",
+              "CarePlus",
+              "555-0200",
+              "V003",
+              "2024-01-15",
+              "R201",
+              "Shared",
+              "300",
+              "D003",
+              "Dr. Lee",
+              "Orthopedics",
+              "DEPT02",
+              "Bone & Joint",
+              "Cast Application",
+              "250",
+              "",
+              ""
+            ],
+            [
+              "P003",
+              "Carol White",
+              "1978-11-30",
+              "HealthFirst",
+              "555-0100",
+              "V004",
+              "2024-01-18",
+              "R101",
+              "Private",
+              "500",
+              "D001",
+              "Dr. Smith",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care",
+              "ECG",
+              "200",
+              "Aspirin",
+              "100mg"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "Identify the repeating groups: TREATMENT1/TREATMENT2 with their costs and medications.",
+        "Each treatment-medication combination should be its own row.",
+        "After unpivoting, the composite key becomes (PATIENT_ID, VISIT_ID, TREATMENT)."
       ]
     },
-    "solutions": {
-      "1NF": {
-        "explanation": "Eliminate repeating treatment and medication groups by creating separate rows for each treatment-medication pair within a visit.",
-        "tables": [
-          {
-            "name": "PATIENT_VISIT_TREATMENT",
-            "columns": [
-              { "name": "PATIENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PATIENT_ID"] },
-              { "name": "PATIENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_NAME"] },
-              { "name": "PATIENT_DOB", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_DOB"] },
-              { "name": "INSURANCE_COMPANY", "type": "attribute", "mappingType": "direct", "sourceCols": ["INSURANCE_COMPANY"] },
-              { "name": "INSURANCE_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["INSURANCE_PHONE"] },
-              { "name": "VISIT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["VISIT_ID"] },
-              { "name": "VISIT_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["VISIT_DATE"] },
-              { "name": "ROOM_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["ROOM_ID"] },
-              { "name": "ROOM_TYPE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ROOM_TYPE"] },
-              { "name": "DAILY_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["DAILY_RATE"] },
-              { "name": "DOCTOR_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["DOCTOR_ID"] },
-              { "name": "DOCTOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DOCTOR_NAME"] },
-              { "name": "SPECIALIZATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SPECIALIZATION"] },
-              { "name": "DEPT_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["DEPT_ID"] },
-              { "name": "DEPT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DEPT_NAME"] },
-              { "name": "TREATMENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["TREATMENT1", "TREATMENT2"] },
-              { "name": "TREATMENT_COST", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["TREATMENT1_COST", "TREATMENT2_COST"] },
-              { "name": "MEDICATION", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["MEDICATION1", "MEDICATION2"] },
-              { "name": "MEDICATION_DOSAGE", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["MEDICATION1_DOSAGE", "MEDICATION2_DOSAGE"] }
+    "2NF": {
+      "explanation": "Remove partial dependencies: patient info depends only on PATIENT_ID; insurance phone depends on insurance company; room details depend on ROOM_ID; doctor info depends on DOCTOR_ID; department name depends on DEPT_ID; treatment cost depends on treatment type; medication dosage depends on medication name. Separate these into appropriate tables.",
+      "tables": [
+        {
+          "name": "PATIENT",
+          "columns": [
+            {
+              "name": "PATIENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.PATIENT_ID"
+              ]
+            },
+            {
+              "name": "PATIENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.PATIENT_NAME"
+              ]
+            },
+            {
+              "name": "PATIENT_DOB",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.PATIENT_DOB"
+              ]
+            },
+            {
+              "name": "INSURANCE_COMPANY",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.INSURANCE_COMPANY"
+              ]
+            },
+            {
+              "name": "INSURANCE_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.INSURANCE_PHONE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "P001",
+              "Alice Johnson",
+              "1985-03-15",
+              "HealthFirst",
+              "555-0100"
             ],
-            "sampleRows": [
-              ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100", "V001", "2024-01-10", "R101", "Private", "500", "D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care", "ECG", "200", "Aspirin", "100mg"],
-              ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100", "V001", "2024-01-10", "R101", "Private", "500", "D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care", "Blood Test", "150", "Lisinopril", "10mg"],
-              ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100", "V002", "2024-02-20", "R102", "Private", "500", "D002", "Dr. Williams", "Cardiology", "DEPT01", "Cardiac Care", "Stress Test", "300", "Metoprolol", "50mg"],
-              ["P002", "Bob Martinez", "1990-07-22", "CarePlus", "555-0200", "V003", "2024-01-15", "R201", "Shared", "300", "D003", "Dr. Lee", "Orthopedics", "DEPT02", "Bone & Joint", "X-Ray", "180", "Ibuprofen", "400mg"],
-              ["P002", "Bob Martinez", "1990-07-22", "CarePlus", "555-0200", "V003", "2024-01-15", "R201", "Shared", "300", "D003", "Dr. Lee", "Orthopedics", "DEPT02", "Bone & Joint", "Cast Application", "250", "", ""],
-              ["P003", "Carol White", "1978-11-30", "HealthFirst", "555-0100", "V004", "2024-01-18", "R101", "Private", "500", "D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care", "ECG", "200", "Aspirin", "100mg"]
-            ]
-          }
-        ],
-        "hints": [
-          "Identify the repeating groups: TREATMENT1/TREATMENT2 with their costs and medications.",
-          "Each treatment-medication combination should be its own row.",
-          "After unpivoting, the composite key becomes (PATIENT_ID, VISIT_ID, TREATMENT)."
-        ]
-      },
-      "2NF": {
-        "explanation": "Remove partial dependencies: patient info depends only on PATIENT_ID; insurance phone depends on insurance company; room details depend on ROOM_ID; doctor info depends on DOCTOR_ID; department name depends on DEPT_ID; treatment cost depends on treatment type; medication dosage depends on medication name. Separate these into appropriate tables.",
-        "tables": [
-          {
-            "name": "PATIENT",
-            "columns": [
-              { "name": "PATIENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PATIENT_ID"] },
-              { "name": "PATIENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_NAME"] },
-              { "name": "PATIENT_DOB", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_DOB"] },
-              { "name": "INSURANCE_COMPANY", "type": "attribute", "mappingType": "direct", "sourceCols": ["INSURANCE_COMPANY"] },
-              { "name": "INSURANCE_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["INSURANCE_PHONE"] }
+            [
+              "P002",
+              "Bob Martinez",
+              "1990-07-22",
+              "CarePlus",
+              "555-0200"
             ],
-            "sampleRows": [
-              ["P001", "Alice Johnson", "1985-03-15", "HealthFirst", "555-0100"],
-              ["P002", "Bob Martinez", "1990-07-22", "CarePlus", "555-0200"],
-              ["P003", "Carol White", "1978-11-30", "HealthFirst", "555-0100"]
+            [
+              "P003",
+              "Carol White",
+              "1978-11-30",
+              "HealthFirst",
+              "555-0100"
             ]
-          },
-          {
-            "name": "ROOM",
-            "columns": [
-              { "name": "ROOM_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ROOM_ID"] },
-              { "name": "ROOM_TYPE", "type": "attribute", "mappingType": "direct", "sourceCols": ["ROOM_TYPE"] },
-              { "name": "DAILY_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["DAILY_RATE"] }
+          ]
+        },
+        {
+          "name": "ROOM",
+          "columns": [
+            {
+              "name": "ROOM_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.ROOM_ID"
+              ]
+            },
+            {
+              "name": "ROOM_TYPE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.ROOM_TYPE"
+              ]
+            },
+            {
+              "name": "DAILY_RATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DAILY_RATE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "R101",
+              "Private",
+              "500"
             ],
-            "sampleRows": [
-              ["R101", "Private", "500"],
-              ["R102", "Private", "500"],
-              ["R201", "Shared", "300"]
-            ]
-          },
-          {
-            "name": "DOCTOR",
-            "columns": [
-              { "name": "DOCTOR_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["DOCTOR_ID"] },
-              { "name": "DOCTOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DOCTOR_NAME"] },
-              { "name": "SPECIALIZATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SPECIALIZATION"] },
-              { "name": "DEPT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["DEPT_ID"] },
-              { "name": "DEPT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DEPT_NAME"] }
+            [
+              "R102",
+              "Private",
+              "500"
             ],
-            "sampleRows": [
-              ["D001", "Dr. Smith", "Cardiology", "DEPT01", "Cardiac Care"],
-              ["D002", "Dr. Williams", "Cardiology", "DEPT01", "Cardiac Care"],
-              ["D003", "Dr. Lee", "Orthopedics", "DEPT02", "Bone & Joint"]
+            [
+              "R201",
+              "Shared",
+              "300"
             ]
-          },
-          {
-            "name": "TREATMENT_TYPE",
-            "columns": [
-              { "name": "TREATMENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["TREATMENT1", "TREATMENT2"] },
-              { "name": "TREATMENT_COST", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["TREATMENT1_COST", "TREATMENT2_COST"] }
+          ]
+        },
+        {
+          "name": "DOCTOR",
+          "columns": [
+            {
+              "name": "DOCTOR_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DOCTOR_ID"
+              ]
+            },
+            {
+              "name": "DOCTOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DOCTOR_NAME"
+              ]
+            },
+            {
+              "name": "SPECIALIZATION",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.SPECIALIZATION"
+              ]
+            },
+            {
+              "name": "DEPT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DEPT_ID"
+              ]
+            },
+            {
+              "name": "DEPT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DEPT_NAME"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "D001",
+              "Dr. Smith",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care"
             ],
-            "sampleRows": [
-              ["ECG", "200"],
-              ["Blood Test", "150"],
-              ["Stress Test", "300"],
-              ["X-Ray", "180"],
-              ["Cast Application", "250"]
-            ]
-          },
-          {
-            "name": "MEDICATION",
-            "columns": [
-              { "name": "MEDICATION", "type": "PK", "mappingType": "consolidate", "sourceCols": ["MEDICATION1", "MEDICATION2"] },
-              { "name": "MEDICATION_DOSAGE", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["MEDICATION1_DOSAGE", "MEDICATION2_DOSAGE"] }
+            [
+              "D002",
+              "Dr. Williams",
+              "Cardiology",
+              "DEPT01",
+              "Cardiac Care"
             ],
-            "sampleRows": [
-              ["Aspirin", "100mg"],
-              ["Lisinopril", "10mg"],
-              ["Metoprolol", "50mg"],
-              ["Ibuprofen", "400mg"]
+            [
+              "D003",
+              "Dr. Lee",
+              "Orthopedics",
+              "DEPT02",
+              "Bone & Joint"
             ]
-          },
-          {
-            "name": "VISIT",
-            "columns": [
-              { "name": "VISIT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["VISIT_ID"] },
-              { "name": "PATIENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PATIENT_ID"] },
-              { "name": "VISIT_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["VISIT_DATE"] },
-              { "name": "ROOM_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ROOM_ID"] },
-              { "name": "DOCTOR_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["DOCTOR_ID"] }
+          ]
+        },
+        {
+          "name": "TREATMENT_TYPE",
+          "columns": [
+            {
+              "name": "TREATMENT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.TREATMENT"
+              ]
+            },
+            {
+              "name": "TREATMENT_COST",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.TREATMENT_COST"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "ECG",
+              "200"
             ],
-            "sampleRows": [
-              ["V001", "P001", "2024-01-10", "R101", "D001"],
-              ["V002", "P001", "2024-02-20", "R102", "D002"],
-              ["V003", "P002", "2024-01-15", "R201", "D003"],
-              ["V004", "P003", "2024-01-18", "R101", "D001"]
-            ]
-          },
-          {
-            "name": "VISIT_TREATMENT",
-            "columns": [
-              { "name": "VISIT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["VISIT_ID"] },
-              { "name": "TREATMENT", "type": "FK", "mappingType": "consolidate", "sourceCols": ["TREATMENT1", "TREATMENT2"] },
-              { "name": "MEDICATION", "type": "FK", "mappingType": "consolidate", "sourceCols": ["MEDICATION1", "MEDICATION2"] }
+            [
+              "Blood Test",
+              "150"
             ],
-            "sampleRows": [
-              ["V001", "ECG", "Aspirin"],
-              ["V001", "Blood Test", "Lisinopril"],
-              ["V002", "Stress Test", "Metoprolol"],
-              ["V003", "X-Ray", "Ibuprofen"],
-              ["V003", "Cast Application", ""],
-              ["V004", "ECG", "Aspirin"]
-            ]
-          }
-        ],
-        "hints": [
-          "Patient name and DOB depend only on PATIENT_ID.",
-          "Room type and daily rate depend only on ROOM_ID.",
-          "Doctor name and specialization depend only on DOCTOR_ID.",
-          "Treatment cost is standard for each treatment type, not visit-specific.",
-          "Create separate tables for entities and their relationships."
-        ]
-      },
-      "3NF": {
-        "explanation": "Remove transitive dependencies: INSURANCE_PHONE depends on INSURANCE_COMPANY (not directly on PATIENT_ID); DEPT_NAME depends on DEPT_ID (not directly on DOCTOR_ID); DAILY_RATE depends on ROOM_TYPE (not directly on ROOM_ID); MEDICATION_DOSAGE is standard for each medication (not visit-specific). Extract these into separate tables.",
-        "tables": [
-          {
-            "name": "INSURANCE_COMPANY",
-            "columns": [
-              { "name": "INSURANCE_COMPANY", "type": "PK", "mappingType": "direct", "sourceCols": ["INSURANCE_COMPANY"] },
-              { "name": "INSURANCE_PHONE", "type": "attribute", "mappingType": "direct", "sourceCols": ["INSURANCE_PHONE"] }
+            [
+              "Stress Test",
+              "300"
             ],
-            "sampleRows": [
-              ["HealthFirst", "555-0100"],
-              ["CarePlus", "555-0200"]
-            ]
-          },
-          {
-            "name": "PATIENT",
-            "columns": [
-              { "name": "PATIENT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["PATIENT_ID"] },
-              { "name": "PATIENT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_NAME"] },
-              { "name": "PATIENT_DOB", "type": "attribute", "mappingType": "direct", "sourceCols": ["PATIENT_DOB"] },
-              { "name": "INSURANCE_COMPANY", "type": "FK", "mappingType": "direct", "sourceCols": ["INSURANCE_COMPANY"] }
+            [
+              "X-Ray",
+              "180"
             ],
-            "sampleRows": [
-              ["P001", "Alice Johnson", "1985-03-15", "HealthFirst"],
-              ["P002", "Bob Martinez", "1990-07-22", "CarePlus"],
-              ["P003", "Carol White", "1978-11-30", "HealthFirst"]
+            [
+              "Cast Application",
+              "250"
             ]
-          },
-          {
-            "name": "DEPARTMENT",
-            "columns": [
-              { "name": "DEPT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["DEPT_ID"] },
-              { "name": "DEPT_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DEPT_NAME"] }
+          ]
+        },
+        {
+          "name": "MEDICATION",
+          "columns": [
+            {
+              "name": "MEDICATION",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.MEDICATION"
+              ]
+            },
+            {
+              "name": "MEDICATION_DOSAGE",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.MEDICATION_DOSAGE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "Aspirin",
+              "100mg"
             ],
-            "sampleRows": [
-              ["DEPT01", "Cardiac Care"],
-              ["DEPT02", "Bone & Joint"]
-            ]
-          },
-          {
-            "name": "DOCTOR",
-            "columns": [
-              { "name": "DOCTOR_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["DOCTOR_ID"] },
-              { "name": "DOCTOR_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["DOCTOR_NAME"] },
-              { "name": "SPECIALIZATION", "type": "attribute", "mappingType": "direct", "sourceCols": ["SPECIALIZATION"] },
-              { "name": "DEPT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["DEPT_ID"] }
+            [
+              "Lisinopril",
+              "10mg"
             ],
-            "sampleRows": [
-              ["D001", "Dr. Smith", "Cardiology", "DEPT01"],
-              ["D002", "Dr. Williams", "Cardiology", "DEPT01"],
-              ["D003", "Dr. Lee", "Orthopedics", "DEPT02"]
-            ]
-          },
-          {
-            "name": "ROOM_TYPE",
-            "columns": [
-              { "name": "ROOM_TYPE", "type": "PK", "mappingType": "direct", "sourceCols": ["ROOM_TYPE"] },
-              { "name": "DAILY_RATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["DAILY_RATE"] }
+            [
+              "Metoprolol",
+              "50mg"
             ],
-            "sampleRows": [
-              ["Private", "500"],
-              ["Shared", "300"]
+            [
+              "Ibuprofen",
+              "400mg"
             ]
-          },
-          {
-            "name": "ROOM",
-            "columns": [
-              { "name": "ROOM_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["ROOM_ID"] },
-              { "name": "ROOM_TYPE", "type": "FK", "mappingType": "direct", "sourceCols": ["ROOM_TYPE"] }
+          ]
+        },
+        {
+          "name": "VISIT",
+          "columns": [
+            {
+              "name": "VISIT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.VISIT_ID"
+              ]
+            },
+            {
+              "name": "PATIENT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.PATIENT_ID"
+              ]
+            },
+            {
+              "name": "VISIT_DATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.VISIT_DATE"
+              ]
+            },
+            {
+              "name": "ROOM_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.ROOM_ID"
+              ]
+            },
+            {
+              "name": "DOCTOR_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.DOCTOR_ID"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "V001",
+              "P001",
+              "2024-01-10",
+              "R101",
+              "D001"
             ],
-            "sampleRows": [
-              ["R101", "Private"],
-              ["R102", "Private"],
-              ["R201", "Shared"]
-            ]
-          },
-          {
-            "name": "TREATMENT_TYPE",
-            "columns": [
-              { "name": "TREATMENT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["TREATMENT1", "TREATMENT2"] },
-              { "name": "TREATMENT_COST", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["TREATMENT1_COST", "TREATMENT2_COST"] }
+            [
+              "V002",
+              "P001",
+              "2024-02-20",
+              "R102",
+              "D002"
             ],
-            "sampleRows": [
-              ["ECG", "200"],
-              ["Blood Test", "150"],
-              ["Stress Test", "300"],
-              ["X-Ray", "180"],
-              ["Cast Application", "250"]
-            ]
-          },
-          {
-            "name": "MEDICATION",
-            "columns": [
-              { "name": "MEDICATION", "type": "PK", "mappingType": "consolidate", "sourceCols": ["MEDICATION1", "MEDICATION2"] },
-              { "name": "STANDARD_DOSAGE", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["MEDICATION1_DOSAGE", "MEDICATION2_DOSAGE"] }
+            [
+              "V003",
+              "P002",
+              "2024-01-15",
+              "R201",
+              "D003"
             ],
-            "sampleRows": [
-              ["Aspirin", "100mg"],
-              ["Lisinopril", "10mg"],
-              ["Metoprolol", "50mg"],
-              ["Ibuprofen", "400mg"]
+            [
+              "V004",
+              "P003",
+              "2024-01-18",
+              "R101",
+              "D001"
             ]
-          },
-          {
-            "name": "VISIT",
-            "columns": [
-              { "name": "VISIT_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["VISIT_ID"] },
-              { "name": "PATIENT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["PATIENT_ID"] },
-              { "name": "VISIT_DATE", "type": "attribute", "mappingType": "direct", "sourceCols": ["VISIT_DATE"] },
-              { "name": "ROOM_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["ROOM_ID"] },
-              { "name": "DOCTOR_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["DOCTOR_ID"] }
+          ]
+        },
+        {
+          "name": "VISIT_TREATMENT",
+          "columns": [
+            {
+              "name": "VISIT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.VISIT_ID"
+              ]
+            },
+            {
+              "name": "TREATMENT",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.TREATMENT"
+              ]
+            },
+            {
+              "name": "MEDICATION",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PATIENT_VISIT_TREATMENT.MEDICATION"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "V001",
+              "ECG",
+              "Aspirin"
             ],
-            "sampleRows": [
-              ["V001", "P001", "2024-01-10", "R101", "D001"],
-              ["V002", "P001", "2024-02-20", "R102", "D002"],
-              ["V003", "P002", "2024-01-15", "R201", "D003"],
-              ["V004", "P003", "2024-01-18", "R101", "D001"]
-            ]
-          },
-          {
-            "name": "VISIT_TREATMENT",
-            "columns": [
-              { "name": "VISIT_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["VISIT_ID"] },
-              { "name": "TREATMENT", "type": "FK", "mappingType": "consolidate", "sourceCols": ["TREATMENT1", "TREATMENT2"] },
-              { "name": "MEDICATION", "type": "FK", "mappingType": "consolidate", "sourceCols": ["MEDICATION1", "MEDICATION2"] }
+            [
+              "V001",
+              "Blood Test",
+              "Lisinopril"
             ],
-            "sampleRows": [
-              ["V001", "ECG", "Aspirin"],
-              ["V001", "Blood Test", "Lisinopril"],
-              ["V002", "Stress Test", "Metoprolol"],
-              ["V003", "X-Ray", "Ibuprofen"],
-              ["V003", "Cast Application", ""],
-              ["V004", "ECG", "Aspirin"]
+            [
+              "V002",
+              "Stress Test",
+              "Metoprolol"
+            ],
+            [
+              "V003",
+              "X-Ray",
+              "Ibuprofen"
+            ],
+            [
+              "V003",
+              "Cast Application",
+              ""
+            ],
+            [
+              "V004",
+              "ECG",
+              "Aspirin"
             ]
-          }
-        ],
-        "hints": [
-          "INSURANCE_PHONE depends on INSURANCE_COMPANY, not directly on PATIENT_ID.",
-          "DEPT_NAME depends on DEPT_ID, not directly on DOCTOR_ID.",
-          "DAILY_RATE depends on ROOM_TYPE, not directly on ROOM_ID.",
-          "MEDICATION_DOSAGE is standard for each medication type.",
-          "Extract all transitive dependencies into separate lookup tables."
-        ]
-      }
+          ]
+        }
+      ],
+      "hints": [
+        "Patient name and DOB depend only on PATIENT_ID.",
+        "Room type and daily rate depend only on ROOM_ID.",
+        "Doctor name and specialization depend only on DOCTOR_ID.",
+        "Treatment cost is standard for each treatment type, not visit-specific.",
+        "Create separate tables for entities and their relationships."
+      ]
+    },
+    "3NF": {
+      "explanation": "Remove transitive dependencies: INSURANCE_PHONE depends on INSURANCE_COMPANY (not directly on PATIENT_ID); DEPT_NAME depends on DEPT_ID (not directly on DOCTOR_ID); DAILY_RATE depends on ROOM_TYPE (not directly on ROOM_ID); MEDICATION_DOSAGE is standard for each medication (not visit-specific). Extract these into separate tables.",
+      "tables": [
+        {
+          "name": "INSURANCE_COMPANY",
+          "columns": [
+            {
+              "name": "INSURANCE_COMPANY",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.INSURANCE_COMPANY"
+              ]
+            },
+            {
+              "name": "INSURANCE_PHONE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.INSURANCE_PHONE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "HealthFirst",
+              "555-0100"
+            ],
+            [
+              "CarePlus",
+              "555-0200"
+            ]
+          ]
+        },
+        {
+          "name": "PATIENT",
+          "columns": [
+            {
+              "name": "PATIENT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.PATIENT_ID",
+                "VISIT.PATIENT_ID"
+              ]
+            },
+            {
+              "name": "PATIENT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.PATIENT_NAME"
+              ]
+            },
+            {
+              "name": "PATIENT_DOB",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.PATIENT_DOB"
+              ]
+            },
+            {
+              "name": "INSURANCE_COMPANY",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.INSURANCE_COMPANY"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "P001",
+              "Alice Johnson",
+              "1985-03-15",
+              "HealthFirst"
+            ],
+            [
+              "P002",
+              "Bob Martinez",
+              "1990-07-22",
+              "CarePlus"
+            ],
+            [
+              "P003",
+              "Carol White",
+              "1978-11-30",
+              "HealthFirst"
+            ]
+          ]
+        },
+        {
+          "name": "DEPARTMENT",
+          "columns": [
+            {
+              "name": "DEPT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DEPT_ID"
+              ]
+            },
+            {
+              "name": "DEPT_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DEPT_NAME"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "DEPT01",
+              "Cardiac Care"
+            ],
+            [
+              "DEPT02",
+              "Bone & Joint"
+            ]
+          ]
+        },
+        {
+          "name": "DOCTOR",
+          "columns": [
+            {
+              "name": "DOCTOR_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DOCTOR_ID",
+                "VISIT.DOCTOR_ID"
+              ]
+            },
+            {
+              "name": "DOCTOR_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DOCTOR_NAME"
+              ]
+            },
+            {
+              "name": "SPECIALIZATION",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.SPECIALIZATION"
+              ]
+            },
+            {
+              "name": "DEPT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DEPT_ID"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "D001",
+              "Dr. Smith",
+              "Cardiology",
+              "DEPT01"
+            ],
+            [
+              "D002",
+              "Dr. Williams",
+              "Cardiology",
+              "DEPT01"
+            ],
+            [
+              "D003",
+              "Dr. Lee",
+              "Orthopedics",
+              "DEPT02"
+            ]
+          ]
+        },
+        {
+          "name": "ROOM_TYPE",
+          "columns": [
+            {
+              "name": "ROOM_TYPE",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM.ROOM_TYPE"
+              ]
+            },
+            {
+              "name": "DAILY_RATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM.DAILY_RATE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "Private",
+              "500"
+            ],
+            [
+              "Shared",
+              "300"
+            ]
+          ]
+        },
+        {
+          "name": "ROOM",
+          "columns": [
+            {
+              "name": "ROOM_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM.ROOM_ID",
+                "VISIT.ROOM_ID"
+              ]
+            },
+            {
+              "name": "ROOM_TYPE",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM.ROOM_TYPE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "R101",
+              "Private"
+            ],
+            [
+              "R102",
+              "Private"
+            ],
+            [
+              "R201",
+              "Shared"
+            ]
+          ]
+        },
+        {
+          "name": "TREATMENT_TYPE",
+          "columns": [
+            {
+              "name": "TREATMENT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TREATMENT_TYPE.TREATMENT",
+                "VISIT_TREATMENT.TREATMENT"
+              ]
+            },
+            {
+              "name": "TREATMENT_COST",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TREATMENT_TYPE.TREATMENT_COST"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "ECG",
+              "200"
+            ],
+            [
+              "Blood Test",
+              "150"
+            ],
+            [
+              "Stress Test",
+              "300"
+            ],
+            [
+              "X-Ray",
+              "180"
+            ],
+            [
+              "Cast Application",
+              "250"
+            ]
+          ]
+        },
+        {
+          "name": "MEDICATION",
+          "columns": [
+            {
+              "name": "MEDICATION",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "MEDICATION.MEDICATION",
+                "VISIT_TREATMENT.MEDICATION"
+              ]
+            },
+            {
+              "name": "STANDARD_DOSAGE",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "MEDICATION.MEDICATION_DOSAGE"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "Aspirin",
+              "100mg"
+            ],
+            [
+              "Lisinopril",
+              "10mg"
+            ],
+            [
+              "Metoprolol",
+              "50mg"
+            ],
+            [
+              "Ibuprofen",
+              "400mg"
+            ]
+          ]
+        },
+        {
+          "name": "VISIT",
+          "columns": [
+            {
+              "name": "VISIT_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "VISIT.VISIT_ID",
+                "VISIT_TREATMENT.VISIT_ID"
+              ]
+            },
+            {
+              "name": "PATIENT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "PATIENT.PATIENT_ID",
+                "VISIT.PATIENT_ID"
+              ]
+            },
+            {
+              "name": "VISIT_DATE",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "VISIT.VISIT_DATE"
+              ]
+            },
+            {
+              "name": "ROOM_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "ROOM.ROOM_ID",
+                "VISIT.ROOM_ID"
+              ]
+            },
+            {
+              "name": "DOCTOR_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "DOCTOR.DOCTOR_ID",
+                "VISIT.DOCTOR_ID"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "V001",
+              "P001",
+              "2024-01-10",
+              "R101",
+              "D001"
+            ],
+            [
+              "V002",
+              "P001",
+              "2024-02-20",
+              "R102",
+              "D002"
+            ],
+            [
+              "V003",
+              "P002",
+              "2024-01-15",
+              "R201",
+              "D003"
+            ],
+            [
+              "V004",
+              "P003",
+              "2024-01-18",
+              "R101",
+              "D001"
+            ]
+          ]
+        },
+        {
+          "name": "VISIT_TREATMENT",
+          "columns": [
+            {
+              "name": "VISIT_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "VISIT.VISIT_ID",
+                "VISIT_TREATMENT.VISIT_ID"
+              ]
+            },
+            {
+              "name": "TREATMENT",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "TREATMENT_TYPE.TREATMENT",
+                "VISIT_TREATMENT.TREATMENT"
+              ]
+            },
+            {
+              "name": "MEDICATION",
+              "type": "FK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "MEDICATION.MEDICATION",
+                "VISIT_TREATMENT.MEDICATION"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "V001",
+              "ECG",
+              "Aspirin"
+            ],
+            [
+              "V001",
+              "Blood Test",
+              "Lisinopril"
+            ],
+            [
+              "V002",
+              "Stress Test",
+              "Metoprolol"
+            ],
+            [
+              "V003",
+              "X-Ray",
+              "Ibuprofen"
+            ],
+            [
+              "V003",
+              "Cast Application",
+              ""
+            ],
+            [
+              "V004",
+              "ECG",
+              "Aspirin"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "INSURANCE_PHONE depends on INSURANCE_COMPANY, not directly on PATIENT_ID.",
+        "DEPT_NAME depends on DEPT_ID, not directly on DOCTOR_ID.",
+        "DAILY_RATE depends on ROOM_TYPE, not directly on ROOM_ID.",
+        "MEDICATION_DOSAGE is standard for each medication type.",
+        "Extract all transitive dependencies into separate lookup tables."
+      ]
     }
   }
+}

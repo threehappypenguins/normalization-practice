@@ -1,137 +1,456 @@
 {
-    "id": "employee-project-assignments",
-    "title": "Employee Project Assignments",
-    "difficulty": "easy",
-    "description": "Normalize a table where each row holds an employee, their manager, and multiple projects assigned, plus project-budget data.",
-    "rawData": {
-      "tableName": "RAW_DATA",
-      "columns": ["EMP_ID", "EMP_NAME", "MANAGER_ID", "MANAGER_NAME", "PROJECT1", "PROJECT1_BUDGET", "PROJECT2", "PROJECT2_BUDGET", "PROJECT3", "PROJECT3_BUDGET"],
-      "rows": [
-        ["E001", "Alice", "M100", "John Smith", "Alpha", "10000", "Beta", "15000", "Gamma", "20000"],
-        ["E002", "Bob", "M100", "John Smith", "Alpha", "10000", "", "", "", ""],
-        ["E003", "Charlie", "M200", "Susan Lee", "Delta", "12000", "Gamma", "20000", "", ""]
+  "id": "employee-project-assignments",
+  "title": "Employee Project Assignments",
+  "difficulty": "easy",
+  "description": "Normalize a table where each row holds an employee, their manager, and multiple projects assigned, plus project-budget data.",
+  "rawData": {
+    "tableName": "RAW_DATA",
+    "columns": [
+      "EMP_ID",
+      "EMP_NAME",
+      "MANAGER_ID",
+      "MANAGER_NAME",
+      "PROJECT1",
+      "PROJECT1_BUDGET",
+      "PROJECT2",
+      "PROJECT2_BUDGET",
+      "PROJECT3",
+      "PROJECT3_BUDGET"
+    ],
+    "rows": [
+      [
+        "E001",
+        "Alice",
+        "M100",
+        "John Smith",
+        "Alpha",
+        "10000",
+        "Beta",
+        "15000",
+        "Gamma",
+        "20000"
+      ],
+      [
+        "E002",
+        "Bob",
+        "M100",
+        "John Smith",
+        "Alpha",
+        "10000",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "E003",
+        "Charlie",
+        "M200",
+        "Susan Lee",
+        "Delta",
+        "12000",
+        "Gamma",
+        "20000",
+        "",
+        ""
       ]
-    }, 
-    "solutions": {
-      "1NF": {
-        "explanation": "Eliminate repeating project columns by turning PROJECT1, PROJECT2, PROJECT3 into separate rows.",
-        "tables": [
-          {
-            "name": "EMP_PROJ_ASSIGN",
-            "columns": [
-              { "name": "EMP_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["EMP_ID"] },
-              { "name": "EMP_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["EMP_NAME"] },
-              { "name": "MANAGER_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["MANAGER_ID"] },
-              { "name": "MANAGER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["MANAGER_NAME"] },
-              { "name": "PROJECT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PROJECT1", "PROJECT2", "PROJECT3"] },
-              { "name": "PROJECT_BUDGET", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["PROJECT1_BUDGET", "PROJECT2_BUDGET", "PROJECT3_BUDGET"] }
+    ]
+  },
+  "solutions": {
+    "1NF": {
+      "explanation": "Eliminate repeating project columns by turning PROJECT1, PROJECT2, PROJECT3 into separate rows.",
+      "tables": [
+        {
+          "name": "EMP_PROJ_ASSIGN",
+          "columns": [
+            {
+              "name": "EMP_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_ID"
+              ]
+            },
+            {
+              "name": "EMP_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_NAME"
+              ]
+            },
+            {
+              "name": "MANAGER_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "MANAGER_ID"
+              ]
+            },
+            {
+              "name": "MANAGER_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "MANAGER_NAME"
+              ]
+            },
+            {
+              "name": "PROJECT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PROJECT1",
+                "PROJECT2",
+                "PROJECT3"
+              ]
+            },
+            {
+              "name": "PROJECT_BUDGET",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "PROJECT1_BUDGET",
+                "PROJECT2_BUDGET",
+                "PROJECT3_BUDGET"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "E001",
+              "Alice",
+              "M100",
+              "John Smith",
+              "Alpha",
+              "10000"
             ],
-            "sampleRows": [
-              ["E001", "Alice", "M100", "John Smith", "Alpha", "10000"],
-              ["E001", "Alice", "M100", "John Smith", "Beta", "15000"],
-              ["E001", "Alice", "M100", "John Smith", "Gamma", "20000"],
-              ["E002", "Bob", "M100", "John Smith", "Alpha", "10000"],
-              ["E003", "Charlie", "M200", "Susan Lee", "Delta", "12000"],
-              ["E003", "Charlie", "M200", "Susan Lee", "Gamma", "20000"]
-            ]
-          }
-        ],
-        "hints": [
-          "Look at the project columns: PROJECT1, PROJECT2, PROJECT3 – these are repeating groups.",
-          "In 1NF, you want each project in a separate row instead of separate columns.",
-          "Unpivot the project columns into (PROJECT, PROJECT_BUDGET) pairs."
-        ]
-      },
-      "2NF": {
-        "explanation": "Remove partial dependencies: employee name depends only on EMP_ID, manager info also depends only on EMP_ID, while project budget depends on project name + employee. So we separate employee / manager from assignment.",
-        "tables": [
-          {
-            "name": "EMPLOYEE",
-            "columns": [
-              { "name": "EMP_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["EMP_ID"] },
-              { "name": "EMP_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["EMP_NAME"] },
-              { "name": "MANAGER_ID", "type": "attribute", "mappingType": "direct", "sourceCols": ["MANAGER_ID"] },
-              { "name": "MANAGER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["MANAGER_NAME"] }
+            [
+              "E001",
+              "Alice",
+              "M100",
+              "John Smith",
+              "Beta",
+              "15000"
             ],
-            "sampleRows": [
-              ["E001", "Alice", "M100", "John Smith"],
-              ["E002", "Bob", "M100", "John Smith"],
-              ["E003", "Charlie", "M200", "Susan Lee"]
-            ]
-          },
-          {
-            "name": "ASSIGNMENT",
-            "columns": [
-              { "name": "EMP_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["EMP_ID"] },
-              { "name": "PROJECT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PROJECT1", "PROJECT2", "PROJECT3"] },
-              { "name": "PROJECT_BUDGET", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["PROJECT1_BUDGET", "PROJECT2_BUDGET", "PROJECT3_BUDGET"] }
+            [
+              "E001",
+              "Alice",
+              "M100",
+              "John Smith",
+              "Gamma",
+              "20000"
             ],
-            "sampleRows": [
-              ["E001", "Alpha", "10000"],
-              ["E001", "Beta", "15000"],
-              ["E001", "Gamma", "20000"],
-              ["E002", "Alpha", "10000"],
-              ["E003", "Delta", "12000"],
-              ["E003", "Gamma", "20000"]
-            ]
-          }
-        ],
-        "hints": [
-          "EMP_NAME and MANAGER_NAME both only depend on EMP_ID, not on project.",
-          "So separate EMPLOYEE from ASSIGNMENT.",
-          "The ASSIGNMENT table’s primary key is composite: (EMP_ID, PROJECT)."
-        ]
-      },
-      "3NF": {
-        "explanation": "Remove transitive dependency: manager name depends on manager ID, which is a non-key in EMPLOYEE. We should split manager into its own table.",
-        "tables": [
-          {
-            "name": "MANAGER",
-            "columns": [
-              { "name": "MANAGER_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["MANAGER_ID"] },
-              { "name": "MANAGER_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["MANAGER_NAME"] }
+            [
+              "E002",
+              "Bob",
+              "M100",
+              "John Smith",
+              "Alpha",
+              "10000"
             ],
-            "sampleRows": [
-              ["M100", "John Smith"],
-              ["M200", "Susan Lee"]
-            ]
-          },
-          {
-            "name": "EMPLOYEE",
-            "columns": [
-              { "name": "EMP_ID", "type": "PK", "mappingType": "direct", "sourceCols": ["EMP_ID"] },
-              { "name": "EMP_NAME", "type": "attribute", "mappingType": "direct", "sourceCols": ["EMP_NAME"] },
-              { "name": "MANAGER_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["MANAGER_ID"] }
+            [
+              "E003",
+              "Charlie",
+              "M200",
+              "Susan Lee",
+              "Delta",
+              "12000"
             ],
-            "sampleRows": [
-              ["E001", "Alice", "M100"],
-              ["E002", "Bob", "M100"],
-              ["E003", "Charlie", "M200"]
+            [
+              "E003",
+              "Charlie",
+              "M200",
+              "Susan Lee",
+              "Gamma",
+              "20000"
             ]
-          },
-          {
-            "name": "ASSIGNMENT",
-            "columns": [
-              { "name": "EMP_ID", "type": "FK", "mappingType": "direct", "sourceCols": ["EMP_ID"] },
-              { "name": "PROJECT", "type": "PK", "mappingType": "consolidate", "sourceCols": ["PROJECT1", "PROJECT2", "PROJECT3"] },
-              { "name": "PROJECT_BUDGET", "type": "attribute", "mappingType": "consolidate", "sourceCols": ["PROJECT1_BUDGET", "PROJECT2_BUDGET", "PROJECT3_BUDGET"] }
+          ]
+        }
+      ],
+      "hints": [
+        "Look at the project columns: PROJECT1, PROJECT2, PROJECT3 – these are repeating groups.",
+        "In 1NF, you want each project in a separate row instead of separate columns.",
+        "Unpivot the project columns into (PROJECT, PROJECT_BUDGET) pairs."
+      ]
+    },
+    "2NF": {
+      "explanation": "Remove partial dependencies: employee name depends only on EMP_ID, manager info also depends only on EMP_ID, while project budget depends on project name + employee. So we separate employee / manager from assignment.",
+      "tables": [
+        {
+          "name": "EMPLOYEE",
+          "columns": [
+            {
+              "name": "EMP_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.EMP_ID"
+              ]
+            },
+            {
+              "name": "EMP_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.EMP_NAME"
+              ]
+            },
+            {
+              "name": "MANAGER_ID",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.MANAGER_ID"
+              ]
+            },
+            {
+              "name": "MANAGER_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.MANAGER_NAME"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "E001",
+              "Alice",
+              "M100",
+              "John Smith"
             ],
-            "sampleRows": [
-              ["E001", "Alpha", "10000"],
-              ["E001", "Beta", "15000"],
-              ["E001", "Gamma", "20000"],
-              ["E002", "Alpha", "10000"],
-              ["E003", "Delta", "12000"],
-              ["E003", "Gamma", "20000"]
+            [
+              "E002",
+              "Bob",
+              "M100",
+              "John Smith"
+            ],
+            [
+              "E003",
+              "Charlie",
+              "M200",
+              "Susan Lee"
             ]
-          }
-        ],
-        "hints": [
-          "MANAGER_NAME is functionally dependent on MANAGER_ID, not directly on EMP_ID.",
-          "So create a MANAGER table, make EMPLOYEE refer to MANAGER_ID.",
-          "Now no non-key attribute depends on another non-key attribute (transitive)."
-        ]
-      }
+          ]
+        },
+        {
+          "name": "ASSIGNMENT",
+          "columns": [
+            {
+              "name": "EMP_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.EMP_ID"
+              ]
+            },
+            {
+              "name": "PROJECT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.PROJECT"
+              ]
+            },
+            {
+              "name": "PROJECT_BUDGET",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "EMP_PROJ_ASSIGN.PROJECT_BUDGET"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "E001",
+              "Alpha",
+              "10000"
+            ],
+            [
+              "E001",
+              "Beta",
+              "15000"
+            ],
+            [
+              "E001",
+              "Gamma",
+              "20000"
+            ],
+            [
+              "E002",
+              "Alpha",
+              "10000"
+            ],
+            [
+              "E003",
+              "Delta",
+              "12000"
+            ],
+            [
+              "E003",
+              "Gamma",
+              "20000"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "EMP_NAME and MANAGER_NAME both only depend on EMP_ID, not on project.",
+        "So separate EMPLOYEE from ASSIGNMENT.",
+        "The ASSIGNMENT table’s primary key is composite: (EMP_ID, PROJECT)."
+      ]
+    },
+    "3NF": {
+      "explanation": "Remove transitive dependency: manager name depends on manager ID, which is a non-key in EMPLOYEE. We should split manager into its own table.",
+      "tables": [
+        {
+          "name": "MANAGER",
+          "columns": [
+            {
+              "name": "MANAGER_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.MANAGER_ID"
+              ]
+            },
+            {
+              "name": "MANAGER_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.MANAGER_NAME"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "M100",
+              "John Smith"
+            ],
+            [
+              "M200",
+              "Susan Lee"
+            ]
+          ]
+        },
+        {
+          "name": "EMPLOYEE",
+          "columns": [
+            {
+              "name": "EMP_ID",
+              "type": "PK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.EMP_ID",
+                "ASSIGNMENT.EMP_ID"
+              ]
+            },
+            {
+              "name": "EMP_NAME",
+              "type": "attribute",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.EMP_NAME"
+              ]
+            },
+            {
+              "name": "MANAGER_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.MANAGER_ID"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "E001",
+              "Alice",
+              "M100"
+            ],
+            [
+              "E002",
+              "Bob",
+              "M100"
+            ],
+            [
+              "E003",
+              "Charlie",
+              "M200"
+            ]
+          ]
+        },
+        {
+          "name": "ASSIGNMENT",
+          "columns": [
+            {
+              "name": "EMP_ID",
+              "type": "FK",
+              "mappingType": "direct",
+              "sourceCols": [
+                "EMPLOYEE.EMP_ID",
+                "ASSIGNMENT.EMP_ID"
+              ]
+            },
+            {
+              "name": "PROJECT",
+              "type": "PK",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "ASSIGNMENT.PROJECT"
+              ]
+            },
+            {
+              "name": "PROJECT_BUDGET",
+              "type": "attribute",
+              "mappingType": "consolidate",
+              "sourceCols": [
+                "ASSIGNMENT.PROJECT_BUDGET"
+              ]
+            }
+          ],
+          "sampleRows": [
+            [
+              "E001",
+              "Alpha",
+              "10000"
+            ],
+            [
+              "E001",
+              "Beta",
+              "15000"
+            ],
+            [
+              "E001",
+              "Gamma",
+              "20000"
+            ],
+            [
+              "E002",
+              "Alpha",
+              "10000"
+            ],
+            [
+              "E003",
+              "Delta",
+              "12000"
+            ],
+            [
+              "E003",
+              "Gamma",
+              "20000"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "MANAGER_NAME is functionally dependent on MANAGER_ID, not directly on EMP_ID.",
+        "So create a MANAGER table, make EMPLOYEE refer to MANAGER_ID.",
+        "Now no non-key attribute depends on another non-key attribute (transitive)."
+      ]
     }
   }
-  
+}
