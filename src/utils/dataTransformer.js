@@ -222,6 +222,63 @@ function generateTableDataFromPreviousForm(table, previousFormTables, rawData, p
     return name.trim().toLowerCase().replace(/\s+/g, '_');
   };
 
+  // Helper function to flexibly match table names (similar to validator)
+  // Allows "FLIGHT" to match "FLIGHT_DETAILS" and vice versa
+  const tablesMatch = (tableName1, tableName2) => {
+    const norm1 = normalizeName(tableName1);
+    const norm2 = normalizeName(tableName2);
+    
+    // Exact match
+    if (norm1 === norm2) return true;
+    
+    // One contains the other (e.g., "FLIGHT" matches "FLIGHT_DETAILS")
+    if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
+    
+    // Word-based matching
+    const words1 = norm1.split(/[_\s]+/).filter(w => w.length > 0);
+    const words2 = norm2.split(/[_\s]+/).filter(w => w.length > 0);
+    
+    if (words1.length > 0 && words2.length > 0) {
+      // Check if all words from table1 appear in table2
+      const allWords1Match = words1.every(w1 => 
+        words2.some(w2 => 
+          w1 === w2 || w1.startsWith(w2) || w2.startsWith(w1) ||
+          w1.includes(w2) || w2.includes(w1)
+        )
+      );
+      
+      // Check if all words from table2 appear in table1
+      const allWords2Match = words2.every(w2 =>
+        words1.some(w1 =>
+          w2 === w1 || w2.startsWith(w1) || w1.startsWith(w2) ||
+          w2.includes(w1) || w1.includes(w2)
+        )
+      );
+      
+      if (allWords1Match || allWords2Match) return true;
+    }
+    
+    return false;
+  };
+
+  // Helper function to find a matching table in previousFormTables
+  const findMatchingTable = (targetTableName) => {
+    return previousFormTables.find(t => tablesMatch(t.name, targetTableName));
+  };
+
+  // Collect all solution table names referenced in sourceCols for reverse mapping
+  const solutionTableNames = new Set();
+  table.columns.forEach(col => {
+    if (col.sourceCols && col.sourceCols.length > 0) {
+      col.sourceCols.forEach(sourceCol => {
+        if (sourceCol.includes('.')) {
+          const solutionTableName = sourceCol.split('.')[0];
+          solutionTableNames.add(solutionTableName);
+        }
+      });
+    }
+  });
+
   // First, generate data for each previous form table and create a lookup map
   const previousTableDataMap = new Map();
   const columnDataMap = new Map(); // Maps "tableName.columnName" to array of values
@@ -250,12 +307,23 @@ function generateTableDataFromPreviousForm(table, previousFormTables, rawData, p
         const columnKey = `${prevTable.name}.${col.name}`;
         const columnValues = tableData.map(row => row[colIdx]);
         
-        // Store with exact key
+        // Store with exact key (user's table name)
         columnDataMap.set(columnKey, columnValues);
         
         // Always store with normalized key for flexible matching
         const normalizedKey = `${normalizeName(prevTable.name)}.${normalizeName(col.name)}`;
         columnDataMap.set(normalizedKey, columnValues);
+        
+        // Also store with solution table names if this table matches any solution table
+        // This allows lookups like "FLIGHT_DETAILS.CHAR_TRIP" to find "FLIGHT.CHAR_TRIP"
+        solutionTableNames.forEach(solutionTableName => {
+          if (tablesMatch(prevTable.name, solutionTableName)) {
+            const solutionKey = `${solutionTableName}.${col.name}`;
+            columnDataMap.set(solutionKey, columnValues);
+            const normalizedSolutionKey = `${normalizeName(solutionTableName)}.${normalizeName(col.name)}`;
+            columnDataMap.set(normalizedSolutionKey, columnValues);
+          }
+        });
         
         // Also allow lookup by just column name (for backward compatibility)
         if (!columnDataMap.has(col.name)) {
@@ -311,8 +379,8 @@ function generateTableDataFromPreviousForm(table, previousFormTables, rawData, p
     primaryTableName = previousFormTables[0].name;
   }
 
-  // Get the primary table's data
-  const primaryTable = previousFormTables.find(t => t.name === primaryTableName);
+  // Get the primary table's data - use flexible matching
+  const primaryTable = findMatchingTable(primaryTableName);
   if (!primaryTable || !primaryTable.saved || !rawData) {
     return [];
   }
@@ -375,9 +443,10 @@ function generateTableDataFromPreviousForm(table, previousFormTables, rawData, p
       
       // Try to find by matching table and column names in previousTableDataMap
       // This is the most reliable method - directly access the data
+      // Use flexible table name matching
       for (const [tableId, tableInfo] of previousTableDataMap.entries()) {
         const prevTable = tableInfo.table;
-        if (normalizeName(prevTable.name) === normalizedTableName) {
+        if (tablesMatch(prevTable.name, tableName)) {
           // Try exact column name match first
           let colIdx = tableInfo.columnMap.get(columnName);
           if (colIdx !== undefined && rowIdx < tableInfo.data.length) {
@@ -479,7 +548,7 @@ function generateTableDataFromPreviousForm(table, previousFormTables, rawData, p
   // If all columns reference a single table, use that table for iteration
   if (referencedTables.size === 1) {
     const targetTableName = Array.from(referencedTables)[0];
-    const targetTable = previousFormTables.find(t => normalizeName(t.name) === normalizeName(targetTableName));
+    const targetTable = findMatchingTable(targetTableName);
     if (targetTable && targetTable.saved && rawData) {
       sourceTableForIteration = targetTable;
       // For 3NF: generate 2NF from 1NF; for 2NF: generate 1NF from rawData

@@ -14,55 +14,137 @@ function normalizeName(name) {
  * Find matching column in solution (flexible name matching)
  * Returns the best matching column, prioritizing exact matches
  */
-function findMatchingColumn(userColName, solutionColumns) {
-  const userNormalized = normalizeName(userColName);
+/**
+ * Find a column in solutionColumns that matches targetColName
+ * @param {string} targetColName - The column name to find a match for (e.g., solution column name)
+ * @param {Array} columnsToSearch - Array of columns to search in (e.g., user's columns)
+ * @returns {Object|null} The matching column object, or null if no match
+ */
+function findMatchingColumn(targetColName, columnsToSearch) {
+  const targetNormalized = normalizeName(targetColName);
   
   // First pass: look for exact matches
-  for (const solutionCol of solutionColumns) {
-    const solutionNormalized = normalizeName(solutionCol.name);
-    if (userNormalized === solutionNormalized) {
-      return solutionCol;
+  for (const col of columnsToSearch) {
+    const colNormalized = normalizeName(col.name);
+    if (targetNormalized === colNormalized) {
+      return col;
     }
   }
   
   // Second pass: look for prefix/suffix matches (one starts/ends with the other)
-  // This handles cases like "CREW_MEM" matching "CREW_MEMBER"
-  for (const solutionCol of solutionColumns) {
-    const solutionNormalized = normalizeName(solutionCol.name);
-    if (userNormalized.startsWith(solutionNormalized) || solutionNormalized.startsWith(userNormalized)) {
-      return solutionCol;
+  // This handles cases like "CREW_MEM" matching "CREW_MEMBER" and "BUDGET" matching "PROJECT_BUDGET"
+  let prefixSuffixMatch = null;
+  
+  for (const col of columnsToSearch) {
+    const colNormalized = normalizeName(col.name);
+    const shorter = targetNormalized.length < colNormalized.length ? targetNormalized : colNormalized;
+    const longer = targetNormalized.length >= colNormalized.length ? targetNormalized : colNormalized;
+    
+    // Check if one is a prefix of the other (starts with)
+    const isPrefixMatch = longer.startsWith(shorter);
+    // Check if one is a suffix of the other (ends with)
+    const isSuffixMatch = longer.endsWith(shorter);
+    
+    if (isPrefixMatch) {
+      // For prefix matches, prefer longer matches (more specific)
+      if (!prefixSuffixMatch || colNormalized.length > normalizeName(prefixSuffixMatch.name).length) {
+        prefixSuffixMatch = col;
+      }
+    } else if (isSuffixMatch) {
+      // For suffix matches, accept if shorter name is at least 3 characters
+      // This allows "BUDGET" (6 chars) to match "PROJECT_BUDGET" (14 chars)
+      // Prefer this match if we don't have one yet, or if the current match is also a suffix
+      if (!prefixSuffixMatch) {
+        prefixSuffixMatch = col;
+      } else {
+        // Check if current match is also a suffix match
+        const currentMatchNormalized = normalizeName(prefixSuffixMatch.name);
+        const currentShorter = targetNormalized.length < currentMatchNormalized.length ? targetNormalized : currentMatchNormalized;
+        const currentLonger = targetNormalized.length >= currentMatchNormalized.length ? targetNormalized : currentMatchNormalized;
+        const currentIsSuffix = currentLonger.endsWith(currentShorter);
+        
+        // Prefer suffix matches, or if both are suffix matches, prefer longer column name
+        if (currentIsSuffix && colNormalized.length > currentMatchNormalized.length) {
+          prefixSuffixMatch = col;
+        } else if (!currentIsSuffix) {
+          // If current match is prefix but this is suffix, prefer suffix for cases like "BUDGET" -> "PROJECT_BUDGET"
+          prefixSuffixMatch = col;
+        }
+      }
     }
-    if (userNormalized.endsWith(solutionNormalized) || solutionNormalized.endsWith(userNormalized)) {
-      return solutionCol;
+  }
+  
+  // Return prefix/suffix match if found
+  // For suffix matches like "BUDGET" -> "PROJECT_BUDGET", we accept even if overlap < 70%
+  // because one is clearly a suffix of the other
+  if (prefixSuffixMatch) {
+    const matchNormalized = normalizeName(prefixSuffixMatch.name);
+    const shorter = targetNormalized.length < matchNormalized.length ? targetNormalized : matchNormalized;
+    const longer = targetNormalized.length >= matchNormalized.length ? targetNormalized : matchNormalized;
+    
+    // Check if it's a prefix match (one starts with the other)
+    const isPrefixMatch = longer.startsWith(shorter);
+    // Check if it's a suffix match (one ends with the other)
+    const isSuffixMatch = longer.endsWith(shorter);
+    
+    if (isPrefixMatch) {
+      // For prefix matches, require at least 70% overlap to avoid false matches
+      const overlapRatio = shorter.length / longer.length;
+      if (overlapRatio >= 0.7) {
+        return prefixSuffixMatch;
+      }
+    } else if (isSuffixMatch) {
+      // For suffix matches, accept if shorter name is at least 3 characters
+      // This allows "BUDGET" (6 chars) to match "PROJECT_BUDGET" (14 chars)
+      // because "PROJECT_BUDGET" clearly ends with "BUDGET"
+      if (shorter.length >= 3) {
+        return prefixSuffixMatch;
+      }
     }
   }
   
   // Third pass: word-based matching (more flexible but less preferred)
-  const userWords = userNormalized.split(/[_\s]+/).filter(w => w.length > 0);
+  // Be careful: "BUDGET" should NOT match "PROJECT" even if they share some characters
+  const targetWords = targetNormalized.split(/[_\s]+/).filter(w => w.length > 0);
   
   let bestMatch = null;
   let bestScore = 0;
   
-  for (const solutionCol of solutionColumns) {
-    const solutionNormalized = normalizeName(solutionCol.name);
-    const solutionWords = solutionNormalized.split(/[_\s]+/).filter(w => w.length > 0);
+  for (const col of columnsToSearch) {
+    const colNormalized = normalizeName(col.name);
+    const colWords = colNormalized.split(/[_\s]+/).filter(w => w.length > 0);
     
-    if (userWords.length > 0 && solutionWords.length > 0) {
+    if (targetWords.length > 0 && colWords.length > 0) {
       // Calculate match score based on word overlap
-      const matchingWords = userWords.filter(userWord => 
-        solutionWords.some(solWord => 
-          userWord === solWord || 
-          userWord.startsWith(solWord) || 
-          solWord.startsWith(userWord)
+      // Require that ALL words from the shorter name appear in the longer name
+      // This prevents "BUDGET" from matching "PROJECT" or "PROJECT_BUDGET"
+      const shorterWords = targetWords.length <= colWords.length ? targetWords : colWords;
+      const longerWords = targetWords.length > colWords.length ? targetWords : colWords;
+      
+      const allShorterWordsMatch = shorterWords.every(shortWord => 
+        longerWords.some(longWord => 
+          shortWord === longWord || 
+          shortWord.startsWith(longWord) || 
+          longWord.startsWith(shortWord)
         )
-      ).length;
+      );
       
-      const score = matchingWords / Math.max(userWords.length, solutionWords.length);
-      
-      // Only consider it a match if most words match
-      if (score > 0.5 && score > bestScore) {
-        bestScore = score;
-        bestMatch = solutionCol;
+      if (allShorterWordsMatch) {
+        const matchingWords = targetWords.filter(targetWord => 
+          colWords.some(colWord => 
+            targetWord === colWord || 
+            targetWord.startsWith(colWord) || 
+            colWord.startsWith(targetWord)
+          )
+        ).length;
+        
+        const score = matchingWords / Math.max(targetWords.length, colWords.length);
+        
+        // Only consider it a match if most words match AND all shorter words are in longer
+        if (score > 0.5 && score > bestScore) {
+          bestScore = score;
+          bestMatch = col;
+        }
       }
     }
   }
@@ -73,15 +155,22 @@ function findMatchingColumn(userColName, solutionColumns) {
   
   // Last resort: substring matching (but be very careful)
   // Only match if one is clearly a subset (at least 3 characters and 70% of the shorter string)
-  for (const solutionCol of solutionColumns) {
-    const solutionNormalized = normalizeName(solutionCol.name);
-    const shorter = userNormalized.length < solutionNormalized.length ? userNormalized : solutionNormalized;
-    const longer = userNormalized.length >= solutionNormalized.length ? userNormalized : solutionNormalized;
+  // AND the shorter string appears at the start or end of the longer string (not in the middle)
+  // This prevents "BUDGET" from matching "PROJECT_BUDGET" when "PROJECT_BUDGET" should match "BUDGET" instead
+  for (const col of columnsToSearch) {
+    const colNormalized = normalizeName(col.name);
+    const shorter = targetNormalized.length < colNormalized.length ? targetNormalized : colNormalized;
+    const longer = targetNormalized.length >= colNormalized.length ? targetNormalized : colNormalized;
     
     if (shorter.length >= 3 && longer.includes(shorter)) {
       const overlapRatio = shorter.length / longer.length;
-      if (overlapRatio >= 0.7) {
-        return solutionCol;
+      // Only match if it's a strong overlap (70%+) AND the shorter appears at start/end
+      // This prevents "BUDGET" from matching "PROJECT" (BUDGET is not at start/end of PROJECT)
+      const isAtStart = longer.startsWith(shorter);
+      const isAtEnd = longer.endsWith(shorter);
+      
+      if (overlapRatio >= 0.7 && (isAtStart || isAtEnd)) {
+        return col;
       }
     }
   }
@@ -154,6 +243,107 @@ function columnsMatch(userCol, solutionCol) {
  * @param {Object} solutionCol - Solution column definition
  * @returns {Object} Validation result with valid flag and error message
  */
+/**
+ * Check if two column names match flexibly (similar to findMatchingColumn logic)
+ * Handles cases like "BUDGET" matching "PROJECT_BUDGET"
+ */
+function columnNamesMatch(colName1, colName2) {
+  const norm1 = normalizeName(colName1);
+  const norm2 = normalizeName(colName2);
+  
+  // Exact match
+  if (norm1 === norm2) return true;
+  
+  // Check suffix match (e.g., "BUDGET" matches "PROJECT_BUDGET")
+  const shorter = norm1.length < norm2.length ? norm1 : norm2;
+  const longer = norm1.length >= norm2.length ? norm1 : norm2;
+  
+  if (longer.endsWith(shorter) && shorter.length >= 3) {
+    return true;
+  }
+  
+  // Check prefix match (with 70% overlap requirement)
+  if (longer.startsWith(shorter)) {
+    const overlapRatio = shorter.length / longer.length;
+    if (overlapRatio >= 0.7) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Check if two source columns match flexibly
+ * Handles "tableName.columnName" format with flexible table and column name matching
+ */
+function sourceColsMatch(sourceCol1, sourceCol2) {
+  const norm1 = normalizeName(sourceCol1);
+  const norm2 = normalizeName(sourceCol2);
+  
+  // Exact match after normalization
+  if (norm1 === norm2) return true;
+  
+  // If both are in "tableName.columnName" format, check flexible table and column matching
+  if (sourceCol1.includes('.') && sourceCol2.includes('.')) {
+    const [table1, col1] = sourceCol1.split('.', 2);
+    const [table2, col2] = sourceCol2.split('.', 2);
+    
+    // Table names must match flexibly
+    if (!tablesMatchByName(table1, table2)) return false;
+    
+    // Column names must match flexibly (e.g., "BUDGET" matches "PROJECT_BUDGET")
+    return columnNamesMatch(col1, col2);
+  }
+  
+  // If neither has a dot, just compare normalized names
+  if (!sourceCol1.includes('.') && !sourceCol2.includes('.')) {
+    return norm1 === norm2;
+  }
+  
+  return false;
+}
+
+/**
+ * Check if two table names match flexibly (similar to findMatchingTables logic)
+ */
+function tablesMatchByName(tableName1, tableName2) {
+  const norm1 = normalizeName(tableName1);
+  const norm2 = normalizeName(tableName2);
+  
+  // Exact match
+  if (norm1 === norm2) return true;
+  
+  // One contains the other (e.g., "FLIGHT" matches "FLIGHT_DETAILS")
+  if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
+  
+  // Word-based matching
+  const words1 = norm1.split(/[_\s]+/).filter(w => w.length > 0);
+  const words2 = norm2.split(/[_\s]+/).filter(w => w.length > 0);
+  
+  if (words1.length > 0 && words2.length > 0) {
+    // Check if all words from table1 appear in table2
+    const allWords1Match = words1.every(w1 => 
+      words2.some(w2 => 
+        w1 === w2 || w1.startsWith(w2) || w2.startsWith(w1) ||
+        w1.includes(w2) || w2.includes(w1)
+      )
+    );
+    
+    // Check if all words from table2 appear in table1
+    const allWords2Match = words2.every(w2 =>
+      words1.some(w1 =>
+        w2 === w1 || w2.startsWith(w1) || w1.startsWith(w2) ||
+        w2.includes(w1) || w1.includes(w2)
+      )
+    );
+    
+    if (allWords1Match || allWords2Match) return true;
+  }
+  
+  return false;
+}
+
 function validateColumnMapping(userCol, solutionCol) {
   // If solution doesn't have mapping info, skip mapping validation
   if (!solutionCol.mappingType || !solutionCol.sourceCols) {
@@ -168,27 +358,41 @@ function validateColumnMapping(userCol, solutionCol) {
     };
   }
 
-  // Check source columns match (order doesn't matter)
+  // Check source columns match (order doesn't matter, with flexible table name matching)
+  // If solution has multiple source columns, user needs at least one match (not all)
+  // This handles cases where solution lists multiple possible sources (e.g., FLIGHT_CREW.CHAR_TRIP, FLIGHT_DETAILS.CHAR_TRIP)
+  // but user only has one table that matches both
   if (userCol.sourceCols && solutionCol.sourceCols) {
-    const userSources = new Set(userCol.sourceCols.map(c => normalizeName(c)));
-    const solutionSources = new Set(solutionCol.sourceCols.map(c => normalizeName(c)));
+    // Check if user has at least one source column that matches any solution source column
+    const hasAnyMatch = solutionCol.sourceCols.some(solSource => 
+      userCol.sourceCols.some(userSource => sourceColsMatch(userSource, solSource))
+    );
     
-    if (userSources.size !== solutionSources.size) {
+    if (!hasAnyMatch) {
+      // None of the user's source columns match any solution source column
       return {
         valid: false,
-        error: `${userCol.name} should map to ${solutionCol.sourceCols.length} source column(s): ${solutionCol.sourceCols.join(', ')}`
+        error: `${userCol.name} should include source column: ${solutionCol.sourceCols.join(' or ')}`
       };
     }
-
-    // Check if all solution sources are in user sources
-    for (const solSource of solutionSources) {
-      if (!userSources.has(solSource)) {
+    
+    // If solution has only one source column, user should have exactly one (or at least one matching)
+    // If solution has multiple source columns, user can have one or more (as long as at least one matches)
+    if (solutionCol.sourceCols.length === 1) {
+      // For single source column, check if user's source matches
+      const solSource = solutionCol.sourceCols[0];
+      const hasMatch = userCol.sourceCols.some(userSource => 
+        sourceColsMatch(userSource, solSource)
+      );
+      
+      if (!hasMatch) {
         return {
           valid: false,
-          error: `${userCol.name} should include source column: ${solutionCol.sourceCols.find(c => normalizeName(c) === solSource)}`
+          error: `${userCol.name} should include source column: ${solSource}`
         };
       }
     }
+    // For multiple source columns, we already checked that at least one matches above
   } else if (solutionCol.sourceCols && !userCol.sourceCols) {
     return {
       valid: false,
@@ -288,6 +492,8 @@ function validateTable(userTable, solutionTable) {
   
   // Check for missing columns (using flexible matching)
   solutionTable.columns.forEach(solutionCol => {
+    // Note: findMatchingColumn takes (targetName, columnsToSearch)
+    // We're looking for a user column that matches the solution column name
     const userCol = findMatchingColumn(solutionCol.name, userTable.columns);
     
     if (!userCol) {

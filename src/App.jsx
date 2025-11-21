@@ -190,6 +190,126 @@ function App() {
   const previousFormName = currentForm === '2NF' ? '1NF' : currentForm === '3NF' ? '2NF' : null;
   const previousPreviousFormTables = currentForm === '3NF' && selectedDataset ? loadTablesForForm(selectedDataset.id, '1NF').filter(t => t.saved && t.columns.length > 0) : null;
 
+  // Helper function to normalize table/column names for matching
+  const normalizeName = (name) => {
+    if (!name) return '';
+    return name.trim().toLowerCase().replace(/\s+/g, '_');
+  };
+
+  // Helper function to check if two table names match flexibly
+  const tablesMatch = (tableName1, tableName2) => {
+    const norm1 = normalizeName(tableName1);
+    const norm2 = normalizeName(tableName2);
+    
+    if (norm1 === norm2) return true;
+    if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
+    
+    const words1 = norm1.split(/[_\s]+/).filter(w => w.length > 0);
+    const words2 = norm2.split(/[_\s]+/).filter(w => w.length > 0);
+    
+    if (words1.length > 0 && words2.length > 0) {
+      const allWords1Match = words1.every(w1 => 
+        words2.some(w2 => 
+          w1 === w2 || w1.startsWith(w2) || w2.startsWith(w1) ||
+          w1.includes(w2) || w2.includes(w1)
+        )
+      );
+      const allWords2Match = words2.every(w2 =>
+        words1.some(w1 =>
+          w2 === w1 || w2.startsWith(w1) || w1.startsWith(w2) ||
+          w2.includes(w1) || w1.includes(w2)
+        )
+      );
+      if (allWords1Match || allWords2Match) return true;
+    }
+    
+    return false;
+  };
+
+  // Helper function to find a matching column in a table (similar to validator's findMatchingColumn)
+  const findMatchingColumnInTable = (targetColName, table) => {
+    if (!table || !table.columns) return null;
+    
+    const targetNormalized = normalizeName(targetColName);
+    
+    // First pass: exact match
+    for (const col of table.columns) {
+      if (normalizeName(col.name) === targetNormalized) {
+        return col;
+      }
+    }
+    
+    // Second pass: suffix match (e.g., "BUDGET" matches "PROJECT_BUDGET")
+    let suffixMatch = null;
+    for (const col of table.columns) {
+      const colNormalized = normalizeName(col.name);
+      const shorter = targetNormalized.length < colNormalized.length ? targetNormalized : colNormalized;
+      const longer = targetNormalized.length >= colNormalized.length ? targetNormalized : colNormalized;
+      
+      if (longer.endsWith(shorter) && shorter.length >= 3) {
+        if (!suffixMatch || colNormalized.length > normalizeName(suffixMatch.name).length) {
+          suffixMatch = col;
+        }
+      }
+    }
+    
+    if (suffixMatch) return suffixMatch;
+    
+    // Third pass: prefix match
+    let prefixMatch = null;
+    for (const col of table.columns) {
+      const colNormalized = normalizeName(col.name);
+      const shorter = targetNormalized.length < colNormalized.length ? targetNormalized : colNormalized;
+      const longer = targetNormalized.length >= colNormalized.length ? targetNormalized : colNormalized;
+      
+      if (longer.startsWith(shorter)) {
+        const overlapRatio = shorter.length / longer.length;
+        if (overlapRatio >= 0.7) {
+          if (!prefixMatch || colNormalized.length > normalizeName(prefixMatch.name).length) {
+            prefixMatch = col;
+          }
+        }
+      }
+    }
+    
+    return prefixMatch;
+  };
+
+  // Transform solution sourceCols to use user's actual table and column names from previous form
+  const transformSourceCols = (sourceCols, previousFormTables) => {
+    if (!sourceCols || !previousFormTables || previousFormTables.length === 0) {
+      return sourceCols || [];
+    }
+
+    return sourceCols.map(sourceCol => {
+      // If sourceCol is in "tableName.columnName" format, transform it
+      if (sourceCol.includes('.')) {
+        const [solutionTableName, solutionColumnName] = sourceCol.split('.', 2);
+        
+        // Find the user's table that matches the solution table name
+        const matchingUserTable = previousFormTables.find(userTable => 
+          tablesMatch(userTable.name, solutionTableName)
+        );
+        
+        if (matchingUserTable) {
+          // Find the user's column that matches the solution column name
+          const matchingUserColumn = findMatchingColumnInTable(solutionColumnName, matchingUserTable);
+          
+          if (matchingUserColumn) {
+            // Replace both solution table name and column name with user's actual names
+            return `${matchingUserTable.name}.${matchingUserColumn.name}`;
+          } else {
+            // Table matched but column didn't - use user's table name but keep solution column name
+            return `${matchingUserTable.name}.${solutionColumnName}`;
+          }
+        }
+      }
+      
+      // If not in "tableName.columnName" format, or no match found, return as-is
+      return sourceCol;
+    });
+  };
+
   const handleResetProgress = () => {
     clearProgress();
     localStorage.removeItem('normalizationWork');
@@ -422,6 +542,7 @@ function App() {
               currentForm={currentForm}
               onGenerateTables={(solutionTables) => {
                 // Convert solution tables to user table format
+                // Transform sourceCols to use user's actual table names from previous form
                 const newTables = solutionTables.map((solTable, idx) => ({
                   id: Date.now() + idx,
                   name: solTable.name,
@@ -430,7 +551,11 @@ function App() {
                     name: col.name,
                     type: col.type,
                     mappingType: col.mappingType,
-                    sourceCols: col.sourceCols || []
+                    // For 2NF/3NF, transform sourceCols to use user's previous form table names
+                    // For 1NF, sourceCols reference raw data columns, so keep as-is
+                    sourceCols: currentForm !== '1NF' && previousFormTables && previousFormTables.length > 0
+                      ? transformSourceCols(col.sourceCols || [], previousFormTables)
+                      : (col.sourceCols || [])
                   }))
                 }));
                 setUserTables(newTables);
