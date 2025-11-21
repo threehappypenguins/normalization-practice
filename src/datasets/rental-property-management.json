@@ -463,7 +463,7 @@
             {
               "name": "LEASE_START",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TENANT_LEASE.LEASE_START"
               ]
@@ -471,7 +471,7 @@
             {
               "name": "LEASE_END",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TENANT_LEASE.LEASE_END"
               ]
@@ -479,7 +479,7 @@
             {
               "name": "RENT",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TENANT_LEASE.RENT"
               ]
@@ -723,7 +723,7 @@
             {
               "name": "LEASE_START",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "LEASE.LEASE_START"
               ]
@@ -731,7 +731,7 @@
             {
               "name": "LEASE_END",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "LEASE.LEASE_END"
               ]
@@ -739,7 +739,7 @@
             {
               "name": "RENT",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "LEASE.RENT"
               ]

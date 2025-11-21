@@ -624,7 +624,7 @@
             {
               "name": "TREATMENT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.TREATMENT"
               ]
@@ -632,7 +632,7 @@
             {
               "name": "TREATMENT_COST",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.TREATMENT_COST"
               ]
@@ -667,7 +667,7 @@
             {
               "name": "MEDICATION",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.MEDICATION"
               ]
@@ -675,7 +675,7 @@
             {
               "name": "MEDICATION_DOSAGE",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.MEDICATION_DOSAGE"
               ]
@@ -789,7 +789,7 @@
             {
               "name": "TREATMENT",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.TREATMENT"
               ]
@@ -797,7 +797,7 @@
             {
               "name": "MEDICATION",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PATIENT_VISIT_TREATMENT.MEDICATION"
               ]
@@ -1099,7 +1099,7 @@
             {
               "name": "TREATMENT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TREATMENT_TYPE.TREATMENT",
                 "VISIT_TREATMENT.TREATMENT"
@@ -1108,7 +1108,7 @@
             {
               "name": "TREATMENT_COST",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TREATMENT_TYPE.TREATMENT_COST"
               ]
@@ -1143,7 +1143,7 @@
             {
               "name": "MEDICATION",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "MEDICATION.MEDICATION",
                 "VISIT_TREATMENT.MEDICATION"
@@ -1152,7 +1152,7 @@
             {
               "name": "STANDARD_DOSAGE",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "MEDICATION.MEDICATION_DOSAGE"
               ]
@@ -1271,7 +1271,7 @@
             {
               "name": "TREATMENT",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "TREATMENT_TYPE.TREATMENT",
                 "VISIT_TREATMENT.TREATMENT"
@@ -1280,7 +1280,7 @@
             {
               "name": "MEDICATION",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "MEDICATION.MEDICATION",
                 "VISIT_TREATMENT.MEDICATION"

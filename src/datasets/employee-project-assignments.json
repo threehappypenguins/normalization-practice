@@ -248,7 +248,7 @@
             {
               "name": "PROJECT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "EMP_PROJ_ASSIGN.PROJECT"
               ]
@@ -256,7 +256,7 @@
             {
               "name": "PROJECT_BUDGET",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "EMP_PROJ_ASSIGN.PROJECT_BUDGET"
               ]
@@ -398,7 +398,7 @@
             {
               "name": "PROJECT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "ASSIGNMENT.PROJECT"
               ]
@@ -406,7 +406,7 @@
             {
               "name": "PROJECT_BUDGET",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "ASSIGNMENT.PROJECT_BUDGET"
               ]

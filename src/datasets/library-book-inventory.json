@@ -319,7 +319,7 @@
             {
               "name": "AUTHOR",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "BOOK_INVENTORY.AUTHOR"
               ]
@@ -327,7 +327,7 @@
             {
               "name": "AUTHOR_COUNTRY",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "BOOK_INVENTORY.AUTHOR_COUNTRY"
               ]
@@ -366,7 +366,7 @@
             {
               "name": "AUTHOR",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "BOOK_INVENTORY.AUTHOR"
               ]
@@ -552,7 +552,7 @@
             {
               "name": "AUTHOR",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "AUTHOR.AUTHOR",
                 "BOOK_AUTHOR.AUTHOR"
@@ -561,7 +561,7 @@
             {
               "name": "AUTHOR_COUNTRY",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "AUTHOR.AUTHOR_COUNTRY"
               ]
@@ -602,7 +602,7 @@
             {
               "name": "AUTHOR",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "AUTHOR.AUTHOR",
                 "BOOK_AUTHOR.AUTHOR"

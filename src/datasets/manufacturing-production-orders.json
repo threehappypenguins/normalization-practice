@@ -663,7 +663,7 @@
             {
               "name": "SUPPLIER_ID",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.SUPPLIER_ID"
               ]
@@ -671,7 +671,7 @@
             {
               "name": "SUPPLIER_NAME",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.SUPPLIER_NAME"
               ]
@@ -679,7 +679,7 @@
             {
               "name": "SUPPLIER_COUNTRY",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.SUPPLIER_COUNTRY"
               ]
@@ -780,7 +780,7 @@
             {
               "name": "COMPONENT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.COMPONENT"
               ]
@@ -788,7 +788,7 @@
             {
               "name": "COMPONENT_QTY",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.COMPONENT_QTY"
               ]
@@ -796,7 +796,7 @@
             {
               "name": "SUPPLIER_ID",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "PRODUCTION_ORDERS.SUPPLIER_ID"
               ]
@@ -963,7 +963,7 @@
             {
               "name": "COUNTRY",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "SUPPLIER.SUPPLIER_COUNTRY"
               ]
@@ -998,7 +998,7 @@
             {
               "name": "SUPPLIER_ID",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "SUPPLIER.SUPPLIER_ID",
                 "ORDER_COMPONENT.SUPPLIER_ID"
@@ -1007,7 +1007,7 @@
             {
               "name": "SUPPLIER_NAME",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "SUPPLIER.SUPPLIER_NAME"
               ]
@@ -1015,7 +1015,7 @@
             {
               "name": "SUPPLIER_COUNTRY",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "SUPPLIER.SUPPLIER_COUNTRY"
               ]
@@ -1223,7 +1223,7 @@
             {
               "name": "COMPONENT",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "ORDER_COMPONENT.COMPONENT"
               ]
@@ -1231,7 +1231,7 @@
             {
               "name": "COMPONENT_QTY",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "ORDER_COMPONENT.COMPONENT_QTY"
               ]
@@ -1239,7 +1239,7 @@
             {
               "name": "SUPPLIER_ID",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "SUPPLIER.SUPPLIER_ID",
                 "ORDER_COMPONENT.SUPPLIER_ID"

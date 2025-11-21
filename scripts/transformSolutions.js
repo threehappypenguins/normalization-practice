@@ -140,6 +140,22 @@ const updateColumnSources = (column, prevMeta) => {
   return false;
 };
 
+const normalizeMappingType = (column) => {
+  if (!column || !column.mappingType) return false;
+  const type = column.mappingType.toLowerCase();
+  if (type !== 'consolidate' && type !== 'metadata') {
+    return false;
+  }
+
+  const hasPreviousFormSource = (column.sourceCols || []).some((source) => source.includes('.'));
+  if (hasPreviousFormSource) {
+    column.mappingType = 'direct';
+    return true;
+  }
+
+  return false;
+};
+
 const transformDataset = (dataset) => {
   let changed = false;
   let prevMeta = null;
@@ -153,8 +169,9 @@ const transformDataset = (dataset) => {
     if (index > 0 && prevMeta) {
       formData.tables.forEach((table) => {
         (table.columns || []).forEach((column) => {
-          const updated = updateColumnSources(column, prevMeta);
-          if (updated) {
+          const updatedSources = updateColumnSources(column, prevMeta);
+          const normalizedMapping = normalizeMappingType(column);
+          if (updatedSources || normalizedMapping) {
             changed = true;
           }
         });

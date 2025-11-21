@@ -286,7 +286,7 @@
             {
               "name": "COURSE",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "STUDENT_ENROLLMENT.COURSE"
               ]
@@ -294,7 +294,7 @@
             {
               "name": "CREDITS",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "STUDENT_ENROLLMENT.CREDITS"
               ]
@@ -329,7 +329,7 @@
             {
               "name": "COURSE",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "STUDENT_ENROLLMENT.COURSE"
               ]
@@ -475,7 +475,7 @@
             {
               "name": "COURSE",
               "type": "PK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "COURSE.COURSE",
                 "ENROLLMENT.COURSE"
@@ -484,7 +484,7 @@
             {
               "name": "CREDITS",
               "type": "attribute",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "COURSE.CREDITS"
               ]
@@ -520,7 +520,7 @@
             {
               "name": "COURSE",
               "type": "FK",
-              "mappingType": "consolidate",
+              "mappingType": "direct",
               "sourceCols": [
                 "COURSE.COURSE",
                 "ENROLLMENT.COURSE"
